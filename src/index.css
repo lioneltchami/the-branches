@@ -1,0 +1,53 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: var(--fog);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+:root {
+  --bark: #1c2a22;
+  --pine: #2a4034;
+  --moss: #4f6d58;
+  --leaf: #8fad8a;
+  --mist: #dce6d9;
+  --fog: #f3f6f2;
+  --ember: #a85d3a;
+  --gold: #c9a227;
+  --ink: #142018;
+  --muted: #4d5c52;
+  --paper: #fafcf9;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Figtree', system-ui, sans-serif;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --nav-h: 4.5rem;
+}
