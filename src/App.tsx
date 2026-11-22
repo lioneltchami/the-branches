@@ -1,10 +1,54 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useId, useState, type FormEvent } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import './App.css'
 
-const YOUTUBE = 'https://www.youtube.com/@spiritualguidecheryl2682'
+const YOUTUBE = 'https://www.youtube.com/@cheryloutten8100'
 const BOOK = 'https://www.cherylbay.com/'
 const CONTACT_EMAIL = 'fellowship@thebranches.ca'
+const CHANNEL_AVATAR =
+  'https://yt3.googleusercontent.com/zBiM0uBWTSGM37dGfC-AePG-HolN4OdJRPSgXy3Dgf-Qf03sPz-B7eKNZxEkxUOPQBPyhtpCwQ=s900-c-k-c0x00ffffff-no-rj'
+
+const VIDEOS = [
+  {
+    id: '0n2rBHGGJYY',
+    title: 'How do you respond to stress',
+  },
+  {
+    id: 'i1xwT8xnk_Q',
+    title: 'Finding release during brokenness and pain',
+  },
+  {
+    id: 'cjD9VWG-iKo',
+    title: 'The destruction of jealousy',
+  },
+  {
+    id: 'HN853kgLK40',
+    title: 'Twisted or acceptable? How do your conversations rank before the Lord?',
+  },
+] as const
+
+const FAQ = [
+  {
+    q: 'When do you meet?',
+    a: 'We gather on Saturdays — in homes around Calgary, and online with friends joining from Africa and North America.',
+  },
+  {
+    q: 'Where do you meet in Calgary?',
+    a: 'We rotate through each other’s homes. After you reach out, we’ll share the next gathering details and help you find your place at the table.',
+  },
+  {
+    q: 'Can I join online from another country?',
+    a: 'Yes. Believers already join from across Africa and North America. Tell us where you are and we’ll send the online connection for the next Saturday.',
+  },
+  {
+    q: 'What should I expect as a first-time guest?',
+    a: 'Warm welcome, open Bibles, shared prayer, and honest conversation. No stage performance — just fellowship in the way of Acts.',
+  },
+  {
+    q: 'Do I need to commit before I come?',
+    a: 'No. Come once, listen, pray with us, and see if The Branches feels like home. Belonging grows naturally.',
+  },
+] as const
 
 const fadeUp = {
   hidden: { opacity: 0, y: 28 },
@@ -16,9 +60,17 @@ function App() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [sent, setSent] = useState(false)
+  const [openFaq, setOpenFaq] = useState(0)
+  const faqId = useId()
+
+  const [showSticky, setShowSticky] = useState(false)
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => {
+      const y = window.scrollY
+      setScrolled(y > 24)
+      setShowSticky(y > window.innerHeight * 0.65)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -36,10 +88,14 @@ function App() {
     : {
         initial: 'hidden' as const,
         whileInView: 'show' as const,
-        viewport: { once: true, amount: 0.25 },
+        viewport: { once: true, amount: 0.2 },
         transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
         variants: fadeUp,
       }
+
+  function closeMenu() {
+    setMenuOpen(false)
+  }
 
   function handleContact(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -69,11 +125,11 @@ function App() {
             <span>The Branches</span>
           </a>
           <nav className="nav__links" aria-label="Primary">
+            <a href="#new-here">New here</a>
             <a href="#gather">Gather</a>
-            <a href="#pastor">Pastor Cheryl</a>
             <a href="#teachings">Teachings</a>
             <a href="#join" className="nav__cta">
-              Join us
+              Plan a visit
             </a>
           </nav>
           <button
@@ -93,17 +149,23 @@ function App() {
           className={`nav__drawer ${menuOpen ? 'is-open' : ''}`}
           hidden={!menuOpen}
         >
-          <a href="#gather" onClick={() => setMenuOpen(false)}>
+          <a href="#new-here" onClick={closeMenu}>
+            New here
+          </a>
+          <a href="#gather" onClick={closeMenu}>
             Gather
           </a>
-          <a href="#pastor" onClick={() => setMenuOpen(false)}>
+          <a href="#pastor" onClick={closeMenu}>
             Pastor Cheryl
           </a>
-          <a href="#teachings" onClick={() => setMenuOpen(false)}>
+          <a href="#teachings" onClick={closeMenu}>
             Teachings
           </a>
-          <a href="#join" className="nav__cta" onClick={() => setMenuOpen(false)}>
-            Join us
+          <a href="#faq" onClick={closeMenu}>
+            FAQ
+          </a>
+          <a href="#join" className="nav__cta" onClick={closeMenu}>
+            Plan a visit
           </a>
         </div>
       </header>
@@ -126,7 +188,7 @@ function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
             >
-              Calgary · Africa · North America
+              Home fellowship in Calgary · Online worldwide
             </motion.p>
             <motion.h1
               className="hero__title"
@@ -142,8 +204,8 @@ function App() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.9, delay: 0.4 }}
             >
-              A fellowship of believers meeting in homes on Saturdays — reading
-              the Bible, praying, and living as they did in the book of Acts.
+              Believers meeting in homes on Saturdays — reading the Bible,
+              praying, and living as they did in the book of Acts.
             </motion.p>
             <motion.div
               className="hero__actions"
@@ -152,10 +214,10 @@ function App() {
               transition={{ duration: 0.8, delay: 0.55 }}
             >
               <a className="btn btn--gold" href="#join">
-                Come this Saturday
+                Plan a Saturday visit
               </a>
               <a className="btn btn--ghost" href={YOUTUBE} target="_blank" rel="noreferrer">
-                Watch on YouTube
+                Watch Cheryl on YouTube
               </a>
             </motion.div>
           </div>
@@ -163,6 +225,78 @@ function App() {
             <span>“I am the vine; you are the branches.”</span>
             <cite>John 15:5</cite>
           </p>
+        </section>
+
+        <div className="whenbar" aria-label="When and where we gather">
+          <div className="wrap whenbar__inner">
+            <p>
+              <strong>Saturdays</strong>
+              <span>Weekly rhythm</span>
+            </p>
+            <p>
+              <strong>Calgary homes</strong>
+              <span>Alberta, in person</span>
+            </p>
+            <p>
+              <strong>Also online</strong>
+              <span>Africa &amp; North America</span>
+            </p>
+            <a className="whenbar__link" href="#join">
+              Get this week’s details →
+            </a>
+          </div>
+        </div>
+
+        <section id="new-here" className="section expect">
+          <div className="wrap">
+            <motion.div className="section__intro" {...motionProps}>
+              <p className="kicker">New here</p>
+              <h2>What to expect</h2>
+              <p className="section__lede">
+                First-time guests often ask the same things. Here is the simple
+                path into fellowship with us.
+              </p>
+            </motion.div>
+
+            <ol className="expect__steps">
+              <motion.li {...motionProps} transition={{ duration: 0.7, delay: 0.05 }}>
+                <span className="expect__num">01</span>
+                <div>
+                  <h3>Say hello</h3>
+                  <p>Tell us your name and whether you are joining in Calgary or online.</p>
+                </div>
+              </motion.li>
+              <motion.li {...motionProps} transition={{ duration: 0.7, delay: 0.1 }}>
+                <span className="expect__num">02</span>
+                <div>
+                  <h3>Receive the next gathering details</h3>
+                  <p>
+                    We share the Saturday home location or online link — never
+                    posted publicly for privacy.
+                  </p>
+                </div>
+              </motion.li>
+              <motion.li {...motionProps} transition={{ duration: 0.7, delay: 0.15 }}>
+                <span className="expect__num">03</span>
+                <div>
+                  <h3>Come as you are</h3>
+                  <p>
+                    Scripture, prayer, and real conversation. Stay as long as
+                    you need. Belonging can grow slowly.
+                  </p>
+                </div>
+              </motion.li>
+            </ol>
+
+            <motion.div className="expect__cta" {...motionProps}>
+              <a className="btn btn--gold" href="#join">
+                Plan a visit
+              </a>
+              <a className="text-link" href="#faq">
+                Read common questions
+              </a>
+            </motion.div>
+          </div>
         </section>
 
         <section id="gather" className="section gather">
@@ -180,7 +314,6 @@ function App() {
               <motion.article
                 className="gather__panel gather__panel--feature"
                 {...motionProps}
-                transition={{ duration: 0.75, delay: 0.05 }}
               >
                 <img
                   src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1400&q=80"
@@ -189,9 +322,8 @@ function App() {
                 <div className="gather__panel-copy">
                   <h3>Saturdays in each other’s homes</h3>
                   <p>
-                    No stage. No program to impress. Just believers gathered
-                    around the Word — listening, responding, and caring for one
-                    another.
+                    No stage. No program to impress. Believers gathered around
+                    the Word — listening, responding, and caring for one another.
                   </p>
                 </div>
               </motion.article>
@@ -199,7 +331,7 @@ function App() {
               <motion.article
                 className="gather__panel"
                 {...motionProps}
-                transition={{ duration: 0.75, delay: 0.12 }}
+                transition={{ duration: 0.75, delay: 0.08 }}
               >
                 <h3>Scripture &amp; prayer</h3>
                 <p>
@@ -211,7 +343,7 @@ function App() {
               <motion.article
                 className="gather__panel"
                 {...motionProps}
-                transition={{ duration: 0.75, delay: 0.18 }}
+                transition={{ duration: 0.75, delay: 0.14 }}
               >
                 <h3>The way of Acts</h3>
                 <p>
@@ -233,6 +365,9 @@ function App() {
                 across Africa and North America. Distance does not divide the
                 table.
               </p>
+              <a className="btn btn--gold reach__cta" href="#join">
+                Join from where you are
+              </a>
             </motion.div>
             <motion.ul className="reach__list" {...motionProps}>
               <li>
@@ -254,11 +389,8 @@ function App() {
         <section id="pastor" className="section pastor">
           <div className="wrap pastor__grid">
             <motion.div className="pastor__portrait" {...motionProps}>
-              <div className="pastor__frame">
-                <img
-                  src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1200&q=80"
-                  alt="Open Bible resting in soft window light"
-                />
+              <div className="pastor__frame pastor__frame--avatar">
+                <img src={CHANNEL_AVATAR} alt="Pastor Cheryl Outten" />
               </div>
             </motion.div>
             <motion.div className="pastor__copy" {...motionProps}>
@@ -271,12 +403,12 @@ function App() {
                 in the room or joining from afar.
               </p>
               <p>
-                Through her YouTube channel and her writing, she helps believers
-                approach God with courage and care for the wounded with wisdom.
+                Watch her messages on YouTube, and sit with her writing on
+                grief, presence, and walking with the wounded.
               </p>
               <div className="pastor__links">
                 <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
-                  Spiritual Guide Cheryl on YouTube
+                  youtube.com/@cheryloutten8100
                 </a>
                 <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
                   Read about her book
@@ -288,62 +420,116 @@ function App() {
 
         <section id="teachings" className="section teachings">
           <div className="wrap">
-            <motion.div className="section__intro" {...motionProps}>
-              <p className="kicker">Teachings &amp; writing</p>
-              <h2>Grow with us between Saturdays</h2>
-              <p className="section__lede">
-                Watch Pastor Cheryl’s messages and sit with her book on grief,
-                presence, and walking with the wounded.
-              </p>
+            <motion.div className="section__intro section__intro--split" {...motionProps}>
+              <div>
+                <p className="kicker">Teachings &amp; writing</p>
+                <h2>Grow between Saturdays</h2>
+                <p className="section__lede">
+                  Recent messages from Pastor Cheryl — plus her book for those
+                  learning how to walk with the wounded.
+                </p>
+              </div>
+              <a className="btn btn--outline" href={YOUTUBE} target="_blank" rel="noreferrer">
+                Open YouTube channel
+              </a>
             </motion.div>
 
-            <div className="teachings__row">
-              <motion.a
-                className="teach-card teach-card--video"
-                href={YOUTUBE}
-                target="_blank"
-                rel="noreferrer"
-                {...motionProps}
-              >
-                <div className="teach-card__media">
-                  <img
-                    src="https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=1200&q=80"
-                    alt=""
-                  />
-                  <span className="play" aria-hidden="true">
-                    ▶
-                  </span>
-                </div>
-                <div className="teach-card__body">
-                  <p className="kicker">YouTube</p>
-                  <h3>Spiritual Guide Cheryl</h3>
-                  <p>
-                    Teaching on trust, spiritual growth, prayer, and healing —
-                    available wherever you are.
-                  </p>
-                </div>
-              </motion.a>
+            <div className="video-grid">
+              {VIDEOS.map((video, i) => (
+                <motion.a
+                  key={video.id}
+                  className="video-card"
+                  href={`https://www.youtube.com/watch?v=${video.id}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  {...motionProps}
+                  transition={{ duration: 0.65, delay: 0.05 * i }}
+                >
+                  <div className="video-card__thumb">
+                    <img
+                      src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+                      alt=""
+                      loading="lazy"
+                    />
+                    <span className="play" aria-hidden="true">
+                      ▶
+                    </span>
+                  </div>
+                  <h3>{video.title}</h3>
+                </motion.a>
+              ))}
+            </div>
 
-              <motion.a
-                className="teach-card teach-card--book"
-                href={BOOK}
-                target="_blank"
-                rel="noreferrer"
-                {...motionProps}
-                transition={{ duration: 0.75, delay: 0.1 }}
-              >
-                <div className="teach-card__body">
-                  <p className="kicker">The book</p>
-                  <h3>What Not to Say</h3>
-                  <p className="teach-card__subtitle">How to Walk With The Wounded</p>
-                  <p>
-                    A raw and honest look at what is needed in seasons of grief
-                    and pain — for those who hurt, and those learning how to
-                    walk beside them.
-                  </p>
-                  <span className="text-link">Visit the book site</span>
-                </div>
-              </motion.a>
+            <motion.a
+              className="book-banner"
+              href={BOOK}
+              target="_blank"
+              rel="noreferrer"
+              {...motionProps}
+            >
+              <div>
+                <p className="kicker kicker--on-dark">The book</p>
+                <h3>What Not to Say</h3>
+                <p className="book-banner__sub">How to Walk With The Wounded</p>
+                <p>
+                  A raw and honest look at what is needed in seasons of grief
+                  and pain — for those who hurt, and those learning how to walk
+                  beside them.
+                </p>
+              </div>
+              <span className="btn btn--gold">Visit the book site</span>
+            </motion.a>
+          </div>
+        </section>
+
+        <section id="faq" className="section faq">
+          <div className="wrap faq__grid">
+            <motion.div {...motionProps}>
+              <p className="kicker">Questions</p>
+              <h2>Before you come</h2>
+              <p className="section__lede">
+                What people often ask before a first Saturday. Anything else —
+                just write us.
+              </p>
+              <a className="text-link" href="#join">
+                Still unsure? Plan a visit
+              </a>
+            </motion.div>
+
+            <div className="faq__list">
+              {FAQ.map((item, index) => {
+                const open = openFaq === index
+                const panelId = `${faqId}-panel-${index}`
+                const buttonId = `${faqId}-button-${index}`
+                return (
+                  <motion.div className="faq__item" key={item.q} {...motionProps}>
+                    <h3>
+                      <button
+                        type="button"
+                        id={buttonId}
+                        className="faq__q"
+                        aria-expanded={open}
+                        aria-controls={panelId}
+                        onClick={() => setOpenFaq(open ? -1 : index)}
+                      >
+                        <span>{item.q}</span>
+                        <span className="faq__icon" aria-hidden="true">
+                          {open ? '−' : '+'}
+                        </span>
+                      </button>
+                    </h3>
+                    <div
+                      id={panelId}
+                      role="region"
+                      aria-labelledby={buttonId}
+                      hidden={!open}
+                      className="faq__a"
+                    >
+                      <p>{item.a}</p>
+                    </div>
+                  </motion.div>
+                )
+              })}
             </div>
           </div>
         </section>
@@ -351,18 +537,24 @@ function App() {
         <section id="join" className="section join">
           <div className="wrap join__grid">
             <motion.div {...motionProps}>
-              <p className="kicker">Come sit with us</p>
+              <p className="kicker">Plan a visit</p>
               <h2>There is a place for you</h2>
               <p className="section__lede">
                 Whether you are in Calgary or joining online, tell us a little
-                about yourself. We will help you find your way into a Saturday
-                gathering.
+                about yourself. We will reply with the next Saturday details.
               </p>
               <ul className="join__bullets">
                 <li>Saturday home fellowships in Calgary</li>
-                <li>Online connection for friends across continents</li>
+                <li>Online connection across continents</li>
                 <li>Bible reading, prayer, and genuine community</li>
               </ul>
+              <div className="join__next">
+                <h3>What happens next</h3>
+                <p>
+                  Someone from The Branches will follow up, share gathering
+                  details privately, and welcome you in.
+                </p>
+              </div>
             </motion.div>
 
             <motion.form className="join__form" onSubmit={handleContact} {...motionProps}>
@@ -394,7 +586,7 @@ function App() {
                 />
               </label>
               <button className="btn btn--gold btn--block" type="submit">
-                Send a note
+                Send my visit request
               </button>
               {sent ? (
                 <p className="form-note" role="status">
@@ -403,7 +595,7 @@ function App() {
                 </p>
               ) : (
                 <p className="form-note">
-                  This sends a note to {CONTACT_EMAIL}. We look forward to
+                  Opens your email to {CONTACT_EMAIL}. We look forward to
                   welcoming you.
                 </p>
               )}
@@ -413,7 +605,7 @@ function App() {
       </main>
 
       <footer className="footer">
-        <div className="wrap footer__inner">
+        <div className="wrap footer__grid">
           <div className="footer__brand">
             <BranchMark />
             <div>
@@ -421,8 +613,18 @@ function App() {
               <p>Fellowship in the way of Acts</p>
             </div>
           </div>
+          <div className="footer__when">
+            <p>
+              <strong>When</strong> Saturdays
+            </p>
+            <p>
+              <strong>Where</strong> Homes in Calgary · Online worldwide
+            </p>
+            <p>
+              <strong>Led by</strong> Pastor Cheryl Outten
+            </p>
+          </div>
           <div className="footer__meta">
-            <p>Led by Pastor Cheryl Outten · Alberta, Canada</p>
             <p>
               <a href={YOUTUBE} target="_blank" rel="noreferrer">
                 YouTube
@@ -433,10 +635,19 @@ function App() {
               </a>
               <span aria-hidden="true"> · </span>
               <a href={`mailto:${CONTACT_EMAIL}`}>Email</a>
+              <span aria-hidden="true"> · </span>
+              <a href="#faq">FAQ</a>
             </p>
           </div>
         </div>
       </footer>
+
+      <a
+        className={`sticky-cta ${showSticky ? 'is-visible' : ''}`}
+        href="#join"
+      >
+        Plan a Saturday visit
+      </a>
     </div>
   )
 }
