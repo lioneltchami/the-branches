@@ -403,8 +403,8 @@ function App() {
                 </p>
               ) : (
                 <p className="form-note">
-                  Opens your email to {CONTACT_EMAIL}. Update that address anytime
-                  in the site code once you have a dedicated inbox.
+                  This sends a note to {CONTACT_EMAIL}. We look forward to
+                  welcoming you.
                 </p>
               )}
             </motion.form>

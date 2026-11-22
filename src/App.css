@@ -90,7 +90,7 @@
   align-items: center;
   justify-content: center;
   padding: 0.55rem 1rem;
-  border-radius: 999px;
+  border-radius: 0.45rem;
   background: var(--gold);
   color: var(--bark) !important;
   font-weight: 600 !important;
@@ -303,7 +303,7 @@
   gap: 0.4rem;
   min-height: 2.9rem;
   padding: 0.7rem 1.25rem;
-  border-radius: 999px;
+  border-radius: 0.45rem;
   text-decoration: none;
   border: 1px solid transparent;
   font-weight: 600;
