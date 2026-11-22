@@ -2,6 +2,8 @@
 
 Website for **The Branches** — a fellowship meeting in homes on Saturdays to read the Bible and pray in the way of Acts. Led by Pastor Cheryl Outten. Gathering in Calgary, Alberta, with friends joining online from Africa and North America.
 
+**Live site:** [https://lioneltchami.github.io/the-branches/](https://lioneltchami.github.io/the-branches/)
+
 ## Develop
 
 ```bash
