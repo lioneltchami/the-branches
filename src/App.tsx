@@ -1,80 +1,88 @@
-import { useEffect, useId, useState, type FormEvent } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useEffect, useId, useRef, useState, type FormEvent, type MouseEvent } from 'react'
 import './App.css'
 
 const YOUTUBE = 'https://www.youtube.com/@cheryloutten8100'
 const BOOK = 'https://www.cherylbay.com/'
 const CONTACT_EMAIL = 'fellowship@thebranches.ca'
-const CHANNEL_AVATAR =
-  'https://yt3.googleusercontent.com/zBiM0uBWTSGM37dGfC-AePG-HolN4OdJRPSgXy3Dgf-Qf03sPz-B7eKNZxEkxUOPQBPyhtpCwQ=s900-c-k-c0x00ffffff-no-rj'
+
+const NAV = [
+  { href: '#new-here', label: 'New here' },
+  { href: '#gather', label: 'Gather' },
+  { href: '#pastor', label: 'Cheryl' },
+  { href: '#teachings', label: 'Teachings' },
+  { href: '#faq', label: 'FAQ' },
+  { href: '#join', label: 'Plan a visit' },
+] as const
 
 const VIDEOS = [
   {
     id: '0n2rBHGGJYY',
     title: 'How do you respond to stress',
+    src: 'media/cheryl-teaching.jpg',
+    width: 404,
+    height: 720,
+    portrait: true,
   },
   {
     id: 'i1xwT8xnk_Q',
     title: 'Finding release during brokenness and pain',
+    src: 'media/release.jpg',
+    width: 1080,
+    height: 720,
+    portrait: false,
   },
   {
     id: 'cjD9VWG-iKo',
-    title: 'The destruction of jealousy',
+    title: 'The destruction of Jealousy',
+    src: 'media/jealousy.jpg',
+    width: 1080,
+    height: 720,
+    portrait: false,
   },
   {
     id: 'HN853kgLK40',
-    title: 'Twisted or acceptable? How do your conversations rank before the Lord?',
+    title: 'Twisted or Acceptable! How do your conversations rank before the Lord?',
+    src: 'media/conversations.jpg',
+    width: 1080,
+    height: 720,
+    portrait: false,
   },
 ] as const
 
 const FAQ = [
   {
     q: 'When do you meet?',
-    a: 'We gather on Saturdays — in homes around Calgary, and online with friends joining from Africa and North America.',
+    a: 'Every Saturday, 7–9 pm Mountain Time. In homes around Calgary, and online.',
   },
   {
     q: 'Where do you meet in Calgary?',
-    a: 'We rotate through each other’s homes. After you reach out, we’ll share the next gathering details and help you find your place at the table.',
+    a: 'We move between homes. After you write, we send the next address. We don’t post it on this page.',
   },
   {
     q: 'Can I join online from another country?',
-    a: 'Yes. Believers already join from across Africa and North America. Tell us where you are and we’ll send the online connection for the next Saturday.',
+    a: 'Yes. People already join from Africa and North America. Tell us where you are and we’ll send the online connection for the next Saturday.',
   },
   {
-    q: 'What should I expect as a first-time guest?',
-    a: 'Warm welcome, open Bibles, shared prayer, and honest conversation. No stage performance — just fellowship in the way of Acts.',
+    q: 'What should I expect the first time?',
+    a: 'People will say hello. We read the Bible, pray, and talk. There isn’t a stage.',
   },
   {
     q: 'Do I need to commit before I come?',
-    a: 'No. Come once, listen, pray with us, and see if The Branches feels like home. Belonging grows naturally.',
+    a: 'No. Come once. You don’t have to decide that night whether you’ll come back.',
   },
 ] as const
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 28 },
-  show: { opacity: 1, y: 0 },
+function asset(path: string) {
+  return `${import.meta.env.BASE_URL}${path}`
 }
 
 function App() {
-  const reduceMotion = useReducedMotion()
   const [menuOpen, setMenuOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
-  const [sent, setSent] = useState(false)
+  const [mailOpened, setMailOpened] = useState(false)
   const [openFaq, setOpenFaq] = useState(0)
   const faqId = useId()
-
-  const [showSticky, setShowSticky] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY
-      setScrolled(y > 24)
-      setShowSticky(y > window.innerHeight * 0.65)
-    }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? 'hidden' : ''
@@ -83,33 +91,76 @@ function App() {
     }
   }, [menuOpen])
 
-  const motionProps = reduceMotion
-    ? {}
-    : {
-        initial: 'hidden' as const,
-        whileInView: 'show' as const,
-        viewport: { once: true, amount: 0.2 },
-        transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] as const },
-        variants: fadeUp,
-      }
+  useEffect(() => {
+    if (!menuOpen) return
+    const toggle = toggleRef.current
+    const drawer = drawerRef.current
+    if (!toggle || !drawer) return
+    const links = [...drawer.querySelectorAll<HTMLAnchorElement>('a')]
+    const first = links[0]
+    const last = links[links.length - 1]
+    first?.focus()
 
-  function closeMenu() {
+    function onKey(event: globalThis.KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        setMenuOpen(false)
+        toggle?.focus()
+        return
+      }
+      if (event.key !== 'Tab' || !first || !last || !toggle) return
+      const active = document.activeElement
+      if (event.shiftKey && (active === first || active === toggle)) {
+        event.preventDefault()
+        ;(active === first ? toggle : last).focus()
+      } else if (!event.shiftKey && (active === last || active === toggle)) {
+        event.preventDefault()
+        ;(active === last ? toggle : first).focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [menuOpen])
+
+  useEffect(() => {
+    const wide = window.matchMedia('(min-width: 55rem)')
+    const closeIfWide = () => {
+      if (wide.matches) setMenuOpen(false)
+    }
+    wide.addEventListener('change', closeIfWide)
+    return () => wide.removeEventListener('change', closeIfWide)
+  }, [])
+
+  function goTo(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    event.preventDefault()
+    document.body.style.overflow = ''
     setMenuOpen(false)
+    const id = href.slice(1)
+    window.history.pushState(null, '', href)
+    window.requestAnimationFrame(() => {
+      document.getElementById(id)?.scrollIntoView({ block: 'start' })
+      document.getElementById(`${id}-title`)?.focus({ preventScroll: true })
+    })
   }
 
-  function handleContact(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const data = new FormData(e.currentTarget)
+  function handleContact(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const data = new FormData(event.currentTarget)
     const name = String(data.get('name') || '').trim()
     const email = String(data.get('email') || '').trim()
     const place = String(data.get('place') || '').trim()
+    const city = String(data.get('city') || '').trim()
     const message = String(data.get('message') || '').trim()
-    const subject = encodeURIComponent(`The Branches — hello from ${name || 'a friend'}`)
-    const body = encodeURIComponent(
-      `Name: ${name}\nEmail: ${email}\nJoining from: ${place}\n\n${message}`,
+    const lines = [`Name: ${name}`, `Email: ${email}`, `Joining from: ${place}`]
+    if (city) lines.push(`City or country: ${city}`)
+    lines.push('', message)
+    const subject = encodeURIComponent(
+      `The Branches — Saturday visit from ${name || 'a friend'}`,
     )
+    const body = encodeURIComponent(lines.join('\n'))
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
-    setSent(true)
+    setMailOpened(true)
   }
 
   return (
@@ -118,391 +169,190 @@ function App() {
         Skip to content
       </a>
 
-      <header className={`nav ${scrolled ? 'nav--solid' : ''}`}>
+      <header className="nav">
         <div className="nav__inner">
-          <a className="nav__brand" href="#top" aria-label="The Branches home">
+          <a className="nav__brand" href="#top" onClick={(event) => goTo(event, '#top')}>
             <BranchMark />
             <span>The Branches</span>
           </a>
           <nav className="nav__links" aria-label="Primary">
-            <a href="#new-here">New here</a>
-            <a href="#gather">Gather</a>
-            <a href="#teachings">Teachings</a>
-            <a href="#join" className="nav__cta">
-              Plan a visit
-            </a>
+            {NAV.map((item) => (
+              <a key={item.href} href={item.href} onClick={(event) => goTo(event, item.href)}>
+                {item.label}
+              </a>
+            ))}
           </nav>
           <button
+            ref={toggleRef}
             type="button"
             className={`nav__toggle ${menuOpen ? 'is-open' : ''}`}
             aria-expanded={menuOpen}
             aria-controls="mobile-menu"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={() => setMenuOpen((open) => !open)}
           >
             <span />
             <span />
           </button>
         </div>
         <div
+          ref={drawerRef}
           id="mobile-menu"
           className={`nav__drawer ${menuOpen ? 'is-open' : ''}`}
           hidden={!menuOpen}
         >
-          <a href="#new-here" onClick={closeMenu}>
-            New here
-          </a>
-          <a href="#gather" onClick={closeMenu}>
-            Gather
-          </a>
-          <a href="#pastor" onClick={closeMenu}>
-            Pastor Cheryl
-          </a>
-          <a href="#teachings" onClick={closeMenu}>
-            Teachings
-          </a>
-          <a href="#faq" onClick={closeMenu}>
-            FAQ
-          </a>
-          <a href="#join" className="nav__cta" onClick={closeMenu}>
-            Plan a visit
-          </a>
+          <nav aria-label="Primary">
+            {NAV.map((item) => (
+              <a key={item.href} href={item.href} onClick={(event) => goTo(event, item.href)}>
+                {item.label}
+              </a>
+            ))}
+          </nav>
         </div>
       </header>
 
       <main id="main">
         <section id="top" className="hero">
-          <div className="hero__media" aria-hidden="true">
-            <img
-              src="https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=2400&q=80"
-              alt=""
-              className="hero__img"
-            />
-            <div className="hero__veil" />
-            <div className="hero__grain" />
-          </div>
-          <div className="hero__content">
-            <motion.p
-              className="hero__eyebrow"
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
-            >
-              Home fellowship in Calgary · Online worldwide
-            </motion.p>
-            <motion.h1
-              className="hero__title"
-              initial={reduceMotion ? false : { opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            >
-              The Branches
-            </motion.h1>
-            <motion.p
-              className="hero__lede"
-              initial={reduceMotion ? false : { opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.4 }}
-            >
-              Believers meeting in homes on Saturdays — reading the Bible,
-              praying, and living as they did in the book of Acts.
-            </motion.p>
-            <motion.div
-              className="hero__actions"
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.55 }}
-            >
-              <a className="btn btn--gold" href="#join">
-                Plan a Saturday visit
-              </a>
-              <a className="btn btn--ghost" href={YOUTUBE} target="_blank" rel="noreferrer">
-                Watch Cheryl on YouTube
-              </a>
-            </motion.div>
-          </div>
-          <p className="hero__verse">
-            <span>“I am the vine; you are the branches.”</span>
-            <cite>John 15:5</cite>
-          </p>
-        </section>
-
-        <div className="whenbar" aria-label="When and where we gather">
-          <div className="wrap whenbar__inner">
-            <p>
-              <strong>Saturdays</strong>
-              <span>Weekly rhythm</span>
-            </p>
-            <p>
-              <strong>Calgary homes</strong>
-              <span>Alberta, in person</span>
-            </p>
-            <p>
-              <strong>Also online</strong>
-              <span>Africa &amp; North America</span>
-            </p>
-            <a className="whenbar__link" href="#join">
-              Get this week’s details →
-            </a>
-          </div>
-        </div>
-
-        <section id="new-here" className="section expect">
-          <div className="wrap">
-            <motion.div className="section__intro" {...motionProps}>
-              <p className="kicker">New here</p>
-              <h2>What to expect</h2>
-              <p className="section__lede">
-                First-time guests often ask the same things. Here is the simple
-                path into fellowship with us.
+          <div className="wrap hero__grid">
+            <div className="hero__copy">
+              <h1 id="top-title" tabIndex={-1}>
+                The Branches
+              </h1>
+              <p className="lede">
+                We meet in homes in Calgary to read the Bible and pray. People also join online.
               </p>
-            </motion.div>
-
-            <ol className="expect__steps">
-              <motion.li {...motionProps} transition={{ duration: 0.7, delay: 0.05 }}>
-                <span className="expect__num">01</span>
-                <div>
-                  <h3>Say hello</h3>
-                  <p>Tell us your name and whether you are joining in Calgary or online.</p>
-                </div>
-              </motion.li>
-              <motion.li {...motionProps} transition={{ duration: 0.7, delay: 0.1 }}>
-                <span className="expect__num">02</span>
-                <div>
-                  <h3>Receive the next gathering details</h3>
-                  <p>
-                    We share the Saturday home location or online link — never
-                    posted publicly for privacy.
-                  </p>
-                </div>
-              </motion.li>
-              <motion.li {...motionProps} transition={{ duration: 0.7, delay: 0.15 }}>
-                <span className="expect__num">03</span>
-                <div>
-                  <h3>Come as you are</h3>
-                  <p>
-                    Scripture, prayer, and real conversation. Stay as long as
-                    you need. Belonging can grow slowly.
-                  </p>
-                </div>
-              </motion.li>
-            </ol>
-
-            <motion.div className="expect__cta" {...motionProps}>
-              <a className="btn btn--gold" href="#join">
-                Plan a visit
-              </a>
-              <a className="text-link" href="#faq">
-                Read common questions
-              </a>
-            </motion.div>
-          </div>
-        </section>
-
-        <section id="gather" className="section gather">
-          <div className="wrap">
-            <motion.div className="section__intro" {...motionProps}>
-              <p className="kicker">How we gather</p>
-              <h2>Church as a living room</h2>
-              <p className="section__lede">
-                We started with a few believers and a simple conviction: do what
-                the early church did. Open homes. Open Bibles. Shared prayer.
+              <p className="verse">
+                <span>“I am the vine; you are the branches.”</span>
+                <cite>John 15:5</cite>
               </p>
-            </motion.div>
-
-            <div className="gather__grid">
-              <motion.article
-                className="gather__panel gather__panel--feature"
-                {...motionProps}
-              >
-                <img
-                  src="https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&fit=crop&w=1400&q=80"
-                  alt="Warm light in a quiet living room"
-                />
-                <div className="gather__panel-copy">
-                  <h3>Saturdays in each other’s homes</h3>
-                  <p>
-                    No stage. No program to impress. Believers gathered around
-                    the Word — listening, responding, and caring for one another.
-                  </p>
-                </div>
-              </motion.article>
-
-              <motion.article
-                className="gather__panel"
-                {...motionProps}
-                transition={{ duration: 0.75, delay: 0.08 }}
-              >
-                <h3>Scripture &amp; prayer</h3>
-                <p>
-                  We read the Bible together and bring our lives before God —
-                  thankfulness, needs, healing, and bold faith.
-                </p>
-              </motion.article>
-
-              <motion.article
-                className="gather__panel"
-                {...motionProps}
-                transition={{ duration: 0.75, delay: 0.14 }}
-              >
-                <h3>The way of Acts</h3>
-                <p>
-                  Devoted to the apostles’ teaching, fellowship, breaking bread,
-                  and prayer — growing as one body, branch by branch.
-                </p>
-              </motion.article>
-            </div>
-          </div>
-        </section>
-
-        <section className="section reach" aria-labelledby="reach-title">
-          <div className="wrap reach__inner">
-            <motion.div {...motionProps}>
-              <p className="kicker kicker--on-dark">Near and far</p>
-              <h2 id="reach-title">One fellowship, many rooms</h2>
-              <p className="section__lede section__lede--on-dark">
-                Some of us sit together in Calgary. Others join online from
-                across Africa and North America. Distance does not divide the
-                table.
-              </p>
-              <a className="btn btn--gold reach__cta" href="#join">
-                Join from where you are
-              </a>
-            </motion.div>
-            <motion.ul className="reach__list" {...motionProps}>
-              <li>
-                <span className="reach__place">Calgary</span>
-                <span className="reach__note">On the ground, in homes across Alberta</span>
-              </li>
-              <li>
-                <span className="reach__place">Online</span>
-                <span className="reach__note">Believers joining from Africa &amp; North America</span>
-              </li>
-              <li>
-                <span className="reach__place">Saturdays</span>
-                <span className="reach__note">Our weekly rhythm of Word and prayer</span>
-              </li>
-            </motion.ul>
-          </div>
-        </section>
-
-        <section id="pastor" className="section pastor">
-          <div className="wrap pastor__grid">
-            <motion.div className="pastor__portrait" {...motionProps}>
-              <div className="pastor__frame pastor__frame--avatar">
-                <img src={CHANNEL_AVATAR} alt="Pastor Cheryl Outten" />
-              </div>
-            </motion.div>
-            <motion.div className="pastor__copy" {...motionProps}>
-              <p className="kicker">Leadership</p>
-              <h2>Pastor Cheryl Outten</h2>
-              <p>
-                Cheryl shepherds The Branches with a heart for honest faith,
-                inner healing, and walking with people through real life. Her
-                teaching is raw, warm, and rooted in Scripture — whether you are
-                in the room or joining from afar.
-              </p>
-              <p>
-                Watch her messages on YouTube, and sit with her writing on
-                grief, presence, and walking with the wounded.
-              </p>
-              <div className="pastor__links">
+              <SaturdayCard />
+              <div className="hero__actions">
+                <a className="btn" href="#join">
+                  Email us about Saturday
+                </a>
                 <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
-                  youtube.com/@cheryloutten8100
-                </a>
-                <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
-                  Read about her book
+                  Cheryl on YouTube
+                  <span className="sr"> (opens in a new tab)</span>
                 </a>
               </div>
-            </motion.div>
+            </div>
+            <figure className="hero__figure">
+              <img
+                src={asset('media/cheryl-teaching.jpg')}
+                width={404}
+                height={720}
+                alt="Pastor Cheryl Outten speaking, seated by a window."
+              />
+              <figcaption>From her teaching “How do you respond to stress”.</figcaption>
+            </figure>
           </div>
         </section>
 
-        <section id="teachings" className="section teachings">
-          <div className="wrap">
-            <motion.div className="section__intro section__intro--split" {...motionProps}>
-              <div>
-                <p className="kicker">Teachings &amp; writing</p>
-                <h2>Grow between Saturdays</h2>
-                <p className="section__lede">
-                  Recent messages from Pastor Cheryl — plus her book for those
-                  learning how to walk with the wounded.
-                </p>
-              </div>
-              <a className="btn btn--outline" href={YOUTUBE} target="_blank" rel="noreferrer">
-                Open YouTube channel
-              </a>
-            </motion.div>
+        <section id="new-here" className="section">
+          <div className="wrap narrow">
+            <h2 id="new-here-title" tabIndex={-1}>
+              Coming for the first time
+            </h2>
+            <p>Write to us, and we’ll send what you need for the next Saturday.</p>
+            <ol className="steps">
+              <li>
+                <h3>Say who you are</h3>
+                <p>Tell us your name, and whether you’re coming to a home in Calgary or joining online.</p>
+              </li>
+              <li>
+                <h3>Get the next gathering</h3>
+                <p>We send the address or the online link. Neither one goes on this page.</p>
+              </li>
+              <li>
+                <h3>Come and see</h3>
+                <p>We read, pray, and talk. You can come once and decide later.</p>
+              </li>
+            </ol>
+          </div>
+        </section>
 
-            <div className="video-grid">
-              {VIDEOS.map((video, i) => (
-                <motion.a
+        <section id="gather" className="section section--paper">
+          <div className="wrap narrow">
+            <h2 id="gather-title" tabIndex={-1}>
+              When we’re together
+            </h2>
+            <p>
+              We read the Bible and pray, and we talk with each other. There isn’t a stage.
+              If you want to come, write to us and we’ll send the home address or the online link.
+            </p>
+          </div>
+        </section>
+
+        <section id="pastor" className="section">
+          <div className="wrap narrow">
+            <h2 id="pastor-title" tabIndex={-1}>
+              Pastor Cheryl Outten
+            </h2>
+            <p>
+              Cheryl leads The Branches and teaches from Scripture. Recent messages are below,
+              and the rest are on her YouTube channel.
+            </p>
+            <p>
+              <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
+                Cheryl on YouTube
+                <span className="sr"> (opens in a new tab)</span>
+              </a>
+            </p>
+          </div>
+        </section>
+
+        <section id="teachings" className="section section--paper">
+          <div className="wrap">
+            <div className="section__head">
+              <h2 id="teachings-title" tabIndex={-1}>
+                Recent teachings
+              </h2>
+              <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
+                Cheryl on YouTube
+                <span className="sr"> (opens in a new tab)</span>
+              </a>
+            </div>
+            <div className="videos">
+              {VIDEOS.map((video) => (
+                <a
                   key={video.id}
-                  className="video-card"
+                  className={`video ${video.portrait ? 'video--portrait' : ''}`}
                   href={`https://www.youtube.com/watch?v=${video.id}`}
                   target="_blank"
                   rel="noreferrer"
-                  {...motionProps}
-                  transition={{ duration: 0.65, delay: 0.05 * i }}
                 >
-                  <div className="video-card__thumb">
+                  <span className="video__frame">
                     <img
-                      src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+                      src={asset(video.src)}
+                      width={video.width}
+                      height={video.height}
                       alt=""
-                      loading="lazy"
                     />
-                    <span className="play" aria-hidden="true">
-                      ▶
-                    </span>
-                  </div>
-                  <h3>{video.title}</h3>
-                </motion.a>
+                    <span className="video__play" aria-hidden="true" />
+                  </span>
+                  <span className="video__title">{video.title}</span>
+                  <span className="sr"> (opens in a new tab)</span>
+                </a>
               ))}
             </div>
-
-            <motion.a
-              className="book-banner"
-              href={BOOK}
-              target="_blank"
-              rel="noreferrer"
-              {...motionProps}
-            >
-              <div>
-                <p className="kicker kicker--on-dark">The book</p>
-                <h3>What Not to Say</h3>
-                <p className="book-banner__sub">How to Walk With The Wounded</p>
-                <p>
-                  A raw and honest look at what is needed in seasons of grief
-                  and pain — for those who hurt, and those learning how to walk
-                  beside them.
-                </p>
-              </div>
-              <span className="btn btn--gold">Visit the book site</span>
-            </motion.a>
           </div>
         </section>
 
-        <section id="faq" className="section faq">
-          <div className="wrap faq__grid">
-            <motion.div {...motionProps}>
-              <p className="kicker">Questions</p>
-              <h2>Before you come</h2>
-              <p className="section__lede">
-                What people often ask before a first Saturday. Anything else —
-                just write us.
-              </p>
-              <a className="text-link" href="#join">
-                Still unsure? Plan a visit
-              </a>
-            </motion.div>
-
+        <section id="faq" className="section">
+          <div className="wrap faq">
+            <div>
+              <h2 id="faq-title" tabIndex={-1}>
+                Questions
+              </h2>
+              <p>A few things people ask before a first Saturday.</p>
+            </div>
             <div className="faq__list">
               {FAQ.map((item, index) => {
                 const open = openFaq === index
                 const panelId = `${faqId}-panel-${index}`
                 const buttonId = `${faqId}-button-${index}`
                 return (
-                  <motion.div className="faq__item" key={item.q} {...motionProps}>
+                  <div className="faq__item" key={item.q}>
                     <h3>
                       <button
                         type="button"
@@ -514,7 +364,7 @@ function App() {
                       >
                         <span>{item.q}</span>
                         <span className="faq__icon" aria-hidden="true">
-                          {open ? '−' : '+'}
+                          {open ? '–' : '+'}
                         </span>
                       </button>
                     </h3>
@@ -527,37 +377,26 @@ function App() {
                     >
                       <p>{item.a}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 )
               })}
             </div>
           </div>
         </section>
 
-        <section id="join" className="section join">
-          <div className="wrap join__grid">
-            <motion.div {...motionProps}>
-              <p className="kicker">Plan a visit</p>
-              <h2>There is a place for you</h2>
-              <p className="section__lede">
-                Whether you are in Calgary or joining online, tell us a little
-                about yourself. We will reply with the next Saturday details.
+        <section id="join" className="section section--paper">
+          <div className="wrap join">
+            <div>
+              <h2 id="join-title" tabIndex={-1}>
+                Write to us
+              </h2>
+              <p>
+                Send a note if you want the details for the next Saturday. Tell us whether you’re
+                coming in Calgary or joining online.
               </p>
-              <ul className="join__bullets">
-                <li>Saturday home fellowships in Calgary</li>
-                <li>Online connection across continents</li>
-                <li>Bible reading, prayer, and genuine community</li>
-              </ul>
-              <div className="join__next">
-                <h3>What happens next</h3>
-                <p>
-                  Someone from The Branches will follow up, share gathering
-                  details privately, and welcome you in.
-                </p>
-              </div>
-            </motion.div>
-
-            <motion.form className="join__form" onSubmit={handleContact} {...motionProps}>
+              <SaturdayCard />
+            </div>
+            <form className="form" onSubmit={handleContact}>
               <label>
                 Name
                 <input name="name" type="text" autoComplete="name" required />
@@ -568,7 +407,10 @@ function App() {
               </label>
               <label>
                 Where are you joining from?
-                <select name="place" defaultValue="Calgary (in person)" required>
+                <select name="place" required defaultValue="">
+                  <option value="" disabled>
+                    Choose one
+                  </option>
                   <option>Calgary (in person)</option>
                   <option>Elsewhere in Alberta</option>
                   <option>North America (online)</option>
@@ -577,77 +419,88 @@ function App() {
                 </select>
               </label>
               <label>
-                Message
-                <textarea
-                  name="message"
-                  rows={4}
-                  placeholder="I’d love to join this Saturday…"
-                  required
-                />
+                City or country (optional)
+                <input name="city" type="text" autoComplete="address-level2" />
               </label>
-              <button className="btn btn--gold btn--block" type="submit">
-                Send my visit request
+              <label>
+                Message
+                <textarea name="message" rows={4} required placeholder="I’d like to come this Saturday." />
+              </label>
+              <button className="btn btn--block" type="submit">
+                Email us about Saturday
               </button>
-              {sent ? (
+              {mailOpened ? (
                 <p className="form-note" role="status">
-                  Your email app should open with the message ready. If it does
-                  not, write us at {CONTACT_EMAIL}.
+                  Your email app should have opened with the note ready. Nothing has been sent yet.
+                  If it didn’t open, write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
                 </p>
               ) : (
                 <p className="form-note">
-                  Opens your email to {CONTACT_EMAIL}. We look forward to
-                  welcoming you.
+                  This opens an email to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  Nothing is sent until you send it from your mail app.
                 </p>
               )}
-            </motion.form>
+            </form>
+          </div>
+        </section>
+
+        <section id="book" className="section book">
+          <div className="wrap narrow">
+            <h2 id="book-title" tabIndex={-1}>
+              What Not to Say
+            </h2>
+            <p className="book__sub">How to Walk With The Wounded</p>
+            <p>
+              Cheryl’s book about grief: what helps the person who is hurting, and what helps the
+              person walking beside them.
+            </p>
+            <p>
+              <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
+                Read about the book
+                <span className="sr"> (opens in a new tab)</span>
+              </a>
+            </p>
           </div>
         </section>
       </main>
 
       <footer className="footer">
-        <div className="wrap footer__grid">
+        <div className="wrap footer__inner">
           <div className="footer__brand">
             <BranchMark />
             <div>
               <strong>The Branches</strong>
-              <p>Fellowship in the way of Acts</p>
+              <p>Led by Pastor Cheryl Outten</p>
             </div>
           </div>
-          <div className="footer__when">
-            <p>
-              <strong>When</strong> Saturdays
-            </p>
-            <p>
-              <strong>Where</strong> Homes in Calgary · Online worldwide
-            </p>
-            <p>
-              <strong>Led by</strong> Pastor Cheryl Outten
-            </p>
-          </div>
-          <div className="footer__meta">
-            <p>
-              <a href={YOUTUBE} target="_blank" rel="noreferrer">
-                YouTube
-              </a>
-              <span aria-hidden="true"> · </span>
-              <a href={BOOK} target="_blank" rel="noreferrer">
-                Book
-              </a>
-              <span aria-hidden="true"> · </span>
-              <a href={`mailto:${CONTACT_EMAIL}`}>Email</a>
-              <span aria-hidden="true"> · </span>
-              <a href="#faq">FAQ</a>
-            </p>
-          </div>
+          <p className="footer__links">
+            <a href={YOUTUBE} target="_blank" rel="noreferrer">
+              Cheryl on YouTube
+            </a>
+            <a href={BOOK} target="_blank" rel="noreferrer">
+              Book
+            </a>
+            <a href={`mailto:${CONTACT_EMAIL}`}>Email</a>
+            <a href="#faq" onClick={(event) => goTo(event, '#faq')}>
+              FAQ
+            </a>
+          </p>
         </div>
       </footer>
+    </div>
+  )
+}
 
-      <a
-        className={`sticky-cta ${showSticky ? 'is-visible' : ''}`}
-        href="#join"
-      >
-        Plan a Saturday visit
-      </a>
+function SaturdayCard() {
+  return (
+    <div className="saturday" role="group" aria-label="When we meet">
+      <p className="saturday__day">Every Saturday</p>
+      <p className="saturday__time">7–9 pm Mountain Time</p>
+      <ul>
+        <li>Homes in Calgary</li>
+        <li>People also join online</li>
+        <li>Pastor Cheryl Outten</li>
+      </ul>
     </div>
   )
 }
