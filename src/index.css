@@ -80,3 +80,9 @@ h1:focus,
 h2:focus {
   outline: none;
 }
+
+.site {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+}

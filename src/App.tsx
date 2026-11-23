@@ -52,15 +52,27 @@ const VIDEOS = [
 const FAQ = [
   {
     q: 'When do you meet?',
-    a: 'Every Saturday, 7–9 pm Mountain Time. In homes around Calgary, and online.',
+    a: 'Every Saturday, 7–9 pm Mountain Time. In homes around Calgary, and on Zoom.',
   },
   {
     q: 'Where do you meet in Calgary?',
-    a: 'We move between homes. After you write, we send the next address. We don’t post it here.',
+    a: 'Hosting rotates between members’ homes. After you write, we send the next address. We don’t post it here.',
   },
   {
     q: 'Can I join online from another country?',
-    a: 'Yes. People already join from Africa and North America. Tell us where you are and we’ll send the online connection for the next Saturday.',
+    a: 'Yes. Online is through Zoom. People already join from Africa and North America. Tell us where you are and we’ll send the Zoom link for the next Saturday.',
+  },
+  {
+    q: 'How soon do you reply?',
+    a: 'Within a day.',
+  },
+  {
+    q: 'Is there a meal?',
+    a: 'Yes. During the week members agree on what to cook. Each person brings their dish to the hosting home.',
+  },
+  {
+    q: 'Are children welcome?',
+    a: 'Yes. Children join. They have their own interactive sessions on the same topic being studied, so everyone is on the same page.',
   },
   {
     q: 'What should I expect the first time?',
@@ -71,6 +83,9 @@ const FAQ = [
     a: 'No. Come once. You don’t have to decide that night whether you’ll come back.',
   },
 ] as const
+
+/** Set to a file under public/media when a real Saturday photo is ready. No stock. */
+const GATHERING_PHOTO: { src: string; width: number; height: number; alt: string } | null = null
 
 function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path}`
@@ -165,6 +180,7 @@ function App() {
 
   return (
     <div className="site">
+      <div className="amb-grain" aria-hidden="true" />
       <a className="skip" href="#main">
         Skip to content
       </a>
@@ -272,8 +288,8 @@ function App() {
           </div>
         </section>
 
-        <section id="gather" className="section section--paper">
-          <div className="wrap narrow">
+        <section id="gather" className="section section--paper gather">
+          <div className="wrap gather__intro">
             <h2 id="gather-title" tabIndex={-1}>
               When we are together
             </h2>
@@ -282,6 +298,27 @@ function App() {
               us for the next home address or the online link.
             </p>
           </div>
+          <figure className="gather__photo">
+            <div className={`gather__frame ${GATHERING_PHOTO ? '' : 'gather__frame--empty'}`}>
+              {GATHERING_PHOTO ? (
+                <img
+                  src={asset(GATHERING_PHOTO.src)}
+                  width={GATHERING_PHOTO.width}
+                  height={GATHERING_PHOTO.height}
+                  alt={GATHERING_PHOTO.alt}
+                />
+              ) : (
+                <p className="gather__slot">
+                  A Saturday gathering photo will sit here when we have one.
+                </p>
+              )}
+            </div>
+            <figcaption className="wrap">
+              {GATHERING_PHOTO
+                ? GATHERING_PHOTO.alt
+                : 'Gathering photo, added when we have one.'}
+            </figcaption>
+          </figure>
         </section>
 
         <section id="pastor" className="section">
@@ -496,12 +533,18 @@ function App() {
 function SaturdayCard() {
   return (
     <div className="saturday" role="group" aria-label="When we meet">
-      <p className="saturday__day">Every Saturday</p>
+      <div className="saturday__head">
+        <BranchMark />
+        <p className="saturday__day">Every Saturday</p>
+      </div>
       <p className="saturday__time">7–9 pm Mountain Time</p>
       <ul>
-        <li>Homes in Calgary</li>
-        <li>People also join online</li>
+        <li>Calgary homes; hosting rotates</li>
+        <li>Online on Zoom</li>
+        <li>Shared meal: cook and bring what you agreed</li>
+        <li>Children join on the same study topic</li>
         <li>Pastor Cheryl Outten</li>
+        <li>We reply within a day</li>
       </ul>
     </div>
   )
