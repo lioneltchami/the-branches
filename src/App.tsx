@@ -11,7 +11,7 @@ const NAV = [
   { href: '#pastor', label: 'Cheryl' },
   { href: '#teachings', label: 'Teachings' },
   { href: '#faq', label: 'FAQ' },
-  { href: '#join', label: 'Plan a visit' },
+  { href: '#join', label: 'Write to us' },
 ] as const
 
 const VIDEOS = [
@@ -56,7 +56,7 @@ const FAQ = [
   },
   {
     q: 'Where do you meet in Calgary?',
-    a: 'We move between homes. After you write, we send the next address. We don’t post it on this page.',
+    a: 'We move between homes. After you write, we send the next address. We don’t post it here.',
   },
   {
     q: 'Can I join online from another country?',
@@ -64,7 +64,7 @@ const FAQ = [
   },
   {
     q: 'What should I expect the first time?',
-    a: 'People will say hello. We read the Bible, pray, and talk. There isn’t a stage.',
+    a: 'People will say hello. We read the Bible, pray, and talk. There is no stage.',
   },
   {
     q: 'Do I need to commit before I come?',
@@ -156,7 +156,7 @@ function App() {
     if (city) lines.push(`City or country: ${city}`)
     lines.push('', message)
     const subject = encodeURIComponent(
-      `The Branches — Saturday visit from ${name || 'a friend'}`,
+      `The Branches: Saturday visit from ${name || 'a friend'}`,
     )
     const body = encodeURIComponent(lines.join('\n'))
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
@@ -219,7 +219,8 @@ function App() {
                 The Branches
               </h1>
               <p className="lede">
-                We meet in homes in Calgary to read the Bible and pray. People also join online.
+                Home fellowship in Calgary. We read the Bible, pray, and talk. People also join
+                online.
               </p>
               <p className="verse">
                 <span>“I am the vine; you are the branches.”</span>
@@ -253,19 +254,19 @@ function App() {
             <h2 id="new-here-title" tabIndex={-1}>
               Coming for the first time
             </h2>
-            <p>Write to us, and we’ll send what you need for the next Saturday.</p>
+            <p>Write to us. We send the next address or the online link.</p>
             <ol className="steps">
               <li>
                 <h3>Say who you are</h3>
-                <p>Tell us your name, and whether you’re coming to a home in Calgary or joining online.</p>
+                <p>Your name, and whether you’re coming to a Calgary home or joining online.</p>
               </li>
               <li>
                 <h3>Get the next gathering</h3>
-                <p>We send the address or the online link. Neither one goes on this page.</p>
+                <p>We reply with the address or the link. Neither one is posted here.</p>
               </li>
               <li>
-                <h3>Come and see</h3>
-                <p>We read, pray, and talk. You can come once and decide later.</p>
+                <h3>Come that Saturday</h3>
+                <p>We read, pray, and talk. One visit is enough; you decide later about returning.</p>
               </li>
             </ol>
           </div>
@@ -274,11 +275,11 @@ function App() {
         <section id="gather" className="section section--paper">
           <div className="wrap narrow">
             <h2 id="gather-title" tabIndex={-1}>
-              When we’re together
+              When we are together
             </h2>
             <p>
-              We read the Bible and pray, and we talk with each other. There isn’t a stage.
-              If you want to come, write to us and we’ll send the home address or the online link.
+              From 7 to 9 we sit with Scripture open, pray, and talk. There is no stage. Write to
+              us for the next home address or the online link.
             </p>
           </div>
         </section>
@@ -289,8 +290,8 @@ function App() {
               Pastor Cheryl Outten
             </h2>
             <p>
-              Cheryl leads The Branches and teaches from Scripture. Recent messages are below,
-              and the rest are on her YouTube channel.
+              Cheryl leads The Branches and teaches from Scripture. A few recent messages sit
+              below. More are on her YouTube channel.
             </p>
             <p>
               <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
@@ -344,7 +345,7 @@ function App() {
               <h2 id="faq-title" tabIndex={-1}>
                 Questions
               </h2>
-              <p>A few things people ask before a first Saturday.</p>
+              <p>What people ask before they write.</p>
             </div>
             <div className="faq__list">
               {FAQ.map((item, index) => {
@@ -391,8 +392,8 @@ function App() {
                 Write to us
               </h2>
               <p>
-                Send a note if you want the details for the next Saturday. Tell us whether you’re
-                coming in Calgary or joining online.
+                Ask for the next Saturday. Say whether you’re coming in Calgary or joining
+                online.
               </p>
               <SaturdayCard />
             </div>
@@ -431,13 +432,14 @@ function App() {
               </button>
               {mailOpened ? (
                 <p className="form-note" role="status">
-                  Your email app should have opened with the note ready. Nothing has been sent yet.
-                  If it didn’t open, write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  Your mail app should open with the note drafted. Nothing leaves until you send
+                  it. If nothing opened, write to{' '}
+                  <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
                 </p>
               ) : (
                 <p className="form-note">
-                  This opens an email to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-                  Nothing is sent until you send it from your mail app.
+                  This opens a draft to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  Your mail app sends it, not this page.
                 </p>
               )}
             </form>
@@ -451,8 +453,8 @@ function App() {
             </h2>
             <p className="book__sub">How to Walk With The Wounded</p>
             <p>
-              Cheryl’s book about grief: what helps the person who is hurting, and what helps the
-              person walking beside them.
+              Cheryl wrote this for people in grief, and for the friends walking with them: what
+              to say, and what to leave unsaid.
             </p>
             <p>
               <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
