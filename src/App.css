@@ -424,9 +424,24 @@
   margin: 0;
 }
 
+.kids-flow {
+  margin: 0.6rem 0;
+  padding-left: 1.25rem;
+}
+
+.gather__welcome {
+  margin-top: 1.25rem;
+  font-weight: 600;
+}
+
 .children p + p {
   margin-top: 0.6rem;
   color: var(--muted);
+}
+
+.children .kids-flow + p {
+  margin-top: 0.6rem;
+  color: var(--ink);
 }
 
 @media (min-width: 56rem) {

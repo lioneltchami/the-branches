@@ -56,7 +56,7 @@ const VIDEOS = [
 const FAQ = [
   {
     q: 'When do you meet?',
-    a: 'Every Saturday, 7–9 pm Mountain Time. In homes around Calgary, and on Zoom.',
+    a: 'Every Saturday, Mountain Time. Meal 6–7 pm, then the gathering 7–9 pm, then dessert. In homes around Calgary, and on Zoom.',
   },
   {
     q: 'Where do you meet in Calgary?',
@@ -72,11 +72,15 @@ const FAQ = [
   },
   {
     q: 'Is there a meal?',
-    a: 'Yes. During the week members agree on what to cook, and each person brings their dish to the hosting home. On your first Saturday, ask us what to bring when you write.',
+    a: 'Yes, from 6 to 7 pm, before we start. Dessert comes after we finish. During the week members agree on what to cook, and each brings a dish to the hosting home. First-time guests do not bring a dish. Just come and join.',
   },
   {
     q: 'What about parking, what to wear, and a Bible?',
     a: 'We don’t list those here. Ask in your message and we reply within a day.',
+  },
+  {
+    q: 'Can I just listen?',
+    a: 'Yes. In person you can just listen. On Zoom your video can be on or off.',
   },
   {
     q: 'What should I expect the first time?',
@@ -324,7 +328,7 @@ function App() {
               </li>
               <li>
                 <h3>Get the next gathering</h3>
-                <p>We reply with the address or the link. Neither one is posted here. Ask what to bring, if anything.</p>
+                <p>We reply with the address or the link. Neither one is posted here. You do not need to bring a dish.</p>
               </li>
               <li>
                 <h3>Come that Saturday</h3>
@@ -341,30 +345,47 @@ function App() {
                 When we are together
               </h2>
               <p>
-                Saturday, 7 to 9 pm, in a member’s home in Calgary or on Zoom. There is no stage.
-                Write to us and we can tell you how the evening runs.
+                Saturdays, in a member’s home in Calgary or on Zoom. People will say hello. There
+                is no stage.
               </p>
               <dl className="parts">
                 <div>
-                  <dt>Hello</dt>
-                  <dd>People will say hello.</dd>
+                  <dt>6–7 pm</dt>
+                  <dd>
+                    The meal, before we start. Members agree on a menu during the week and each
+                    brings a dish to the home. First-time guests do not bring one. Just come and
+                    join.
+                  </dd>
                 </div>
                 <div>
-                  <dt>The meal</dt>
-                  <dd>Members agree on a menu during the week. Each brings a dish to the home.</dd>
-                </div>
-                <div>
-                  <dt>Scripture and prayer</dt>
+                  <dt>7–9 pm</dt>
                   <dd>We read the Bible, talk about it, and pray. Pastor Cheryl leads.</dd>
                 </div>
                 <div>
-                  <dt>Zoom</dt>
-                  <dd>Join from wherever you are. Ask for the link and we send it for the next Saturday.</dd>
+                  <dt>After we finish</dt>
+                  <dd>Dessert.</dd>
+                </div>
+                <div>
+                  <dt>On Zoom</dt>
+                  <dd>
+                    Join from wherever you are. Ask for the link and we send it for the next
+                    Saturday. Your video can be on or off.
+                  </dd>
                 </div>
               </dl>
+              <p className="gather__welcome">
+                You can just listen. No question is stupid. Come willing to be there, whatever you
+                think you know or don’t know.
+              </p>
             </div>
             <aside className="children" aria-labelledby="children-title">
               <h3 id="children-title">Children come too</h3>
+              <p>All ages are welcome. Here is how the evening goes for children.</p>
+              <ol className="kids-flow">
+                <li>We start together.</li>
+                <li>The children eat.</li>
+                <li>Then they join us.</li>
+              </ol>
               <p>
                 Children have their own interactive sessions on the same topic being studied, so
                 everyone is on the same page.
@@ -630,8 +651,8 @@ function SaturdayCard() {
       <ul>
         <li>Calgary homes; hosting rotates</li>
         <li>Online on Zoom</li>
-        <li>Shared meal, planned during the week</li>
-        <li>Children join on the same study topic</li>
+        <li>Meal 6–7 pm before we start; dessert after</li>
+        <li>All ages welcome, with children’s sessions on the same topic</li>
         <li>Pastor Cheryl Outten</li>
       </ul>
     </div>
