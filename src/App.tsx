@@ -492,11 +492,10 @@ function App() {
               <h2 id="join-title" tabIndex={-1}>
                 Write to us
               </h2>
-              <p>
-                Ask for the next Saturday. Say whether you’re coming in Calgary or joining
-                online.
+              <p className="join__note">
+                Tell us whether you are coming to a Calgary home or joining on Zoom, and how many
+                adults and children. We reply within a day with the address or the Zoom link.
               </p>
-              <SaturdayCard />
             </div>
             {status === 'sent' ? (
               <div className="form form--done" ref={sentRef} tabIndex={-1} role="status">
@@ -634,7 +633,6 @@ function SaturdayCard() {
         <li>Shared meal, planned during the week</li>
         <li>Children join on the same study topic</li>
         <li>Pastor Cheryl Outten</li>
-        <li>We reply within a day</li>
       </ul>
     </div>
   )

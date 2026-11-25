@@ -697,6 +697,11 @@
   color: #5c564c;
 }
 
+.join__note {
+  font-size: 1.1rem;
+  max-width: 28rem;
+}
+
 .form__row {
   display: grid;
   grid-template-columns: 1fr 1fr;
