@@ -380,7 +380,7 @@ function App() {
             </div>
             <aside className="children" aria-labelledby="children-title">
               <h3 id="children-title">Children come too</h3>
-              <p>All ages are welcome. Here is how the evening goes for children.</p>
+              <p>All ages are welcome. For children, the evening goes in this order.</p>
               <ol className="kids-flow">
                 <li>We start together.</li>
                 <li>The children eat.</li>
@@ -413,7 +413,7 @@ function App() {
             <p>
               Walking into a home you have not been to before can feel like a lot. Cheryl leads
               The Branches and teaches from Scripture. She has been in prayer ministry and inner
-              healing for over twenty years. For fifteen of those years she facilitated small
+              healing for over twenty years. For fifteen of those years she led small
               groups in Edmonton, Alberta, under the oversight and training of a local ministry.
             </p>
             <p>
