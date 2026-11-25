@@ -673,6 +673,39 @@
   color: #5c564c;
 }
 
+.form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+.form--done h3 {
+  margin: 0;
+}
+
+.form--done p {
+  margin: 0;
+}
+
+.form--done .text-link {
+  justify-self: start;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+}
+
+.form-note--error {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.btn[disabled] {
+  opacity: 0.7;
+  cursor: progress;
+}
+
 .form-note {
   margin: 0;
   font-size: 0.95rem;

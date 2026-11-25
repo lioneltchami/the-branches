@@ -4,6 +4,10 @@ import './App.css'
 const YOUTUBE = 'https://www.youtube.com/@cheryloutten8100'
 const BOOK = 'https://www.cherylbay.com/'
 const CONTACT_EMAIL = 'fellowship@thebranches.ca'
+const CONTACT_ENDPOINT: string = ''
+const ASK_LABEL = CONTACT_ENDPOINT ? 'Ask about Saturday' : 'Email us about Saturday'
+
+type FormStatus = 'idle' | 'sending' | 'sent' | 'drafted' | 'failed'
 
 const NAV = [
   { href: '#new-here', label: 'New here' },
@@ -87,13 +91,42 @@ const FAQ = [
 /** Set to a file under public/media when a real Saturday photo is ready. No stock. */
 const GATHERING_PHOTO: { src: string; width: number; height: number; alt: string } | null = null
 
+function readRequest(form: HTMLFormElement) {
+  const data = new FormData(form)
+  const get = (key: string) => String(data.get(key) || '').trim()
+  return {
+    name: get('name'),
+    email: get('email'),
+    joining: get('joining'),
+    area: get('area'),
+    adults: get('adults'),
+    children: get('children'),
+    message: get('message'),
+  }
+}
+
+function draftHref(request: ReturnType<typeof readRequest>) {
+  const lines = [
+    `Name: ${request.name}`,
+    `Email: ${request.email}`,
+    `Joining: ${request.joining}`,
+  ]
+  if (request.area) lines.push(`Area or city: ${request.area}`)
+  lines.push(`Adults: ${request.adults}`, `Children: ${request.children}`)
+  if (request.message) lines.push('', request.message)
+  const subject = encodeURIComponent(`The Branches: Saturday visit from ${request.name || 'a friend'}`)
+  return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${encodeURIComponent(lines.join('\n'))}`
+}
+
 function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path}`
 }
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [mailOpened, setMailOpened] = useState(false)
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [fallbackHref, setFallbackHref] = useState('')
+  const sentRef = useRef<HTMLDivElement>(null)
   const [openFaq, setOpenFaq] = useState(0)
   const faqId = useId()
   const toggleRef = useRef<HTMLButtonElement>(null)
@@ -159,24 +192,38 @@ function App() {
     })
   }
 
-  function handleContact(event: FormEvent<HTMLFormElement>) {
+  async function handleContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const name = String(data.get('name') || '').trim()
-    const email = String(data.get('email') || '').trim()
-    const place = String(data.get('place') || '').trim()
-    const city = String(data.get('city') || '').trim()
-    const message = String(data.get('message') || '').trim()
-    const lines = [`Name: ${name}`, `Email: ${email}`, `Joining from: ${place}`]
-    if (city) lines.push(`City or country: ${city}`)
-    lines.push('', message)
-    const subject = encodeURIComponent(
-      `The Branches: Saturday visit from ${name || 'a friend'}`,
-    )
-    const body = encodeURIComponent(lines.join('\n'))
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
-    setMailOpened(true)
+    const form = event.currentTarget
+    const request = readRequest(form)
+    const href = draftHref(request)
+    if (!CONTACT_ENDPOINT) {
+      window.location.href = href
+      setStatus('drafted')
+      return
+    }
+    setStatus('sending')
+    try {
+      const response = await fetch(CONTACT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...request,
+          _subject: `The Branches: Saturday visit from ${request.name}`,
+        }),
+      })
+      if (!response.ok) throw new Error(String(response.status))
+      form.reset()
+      setStatus('sent')
+    } catch {
+      setFallbackHref(href)
+      setStatus('failed')
+    }
   }
+
+  useEffect(() => {
+    if (status === 'sent') sentRef.current?.focus()
+  }, [status])
 
   return (
     <div className="site">
@@ -245,7 +292,7 @@ function App() {
               <SaturdayCard />
               <div className="hero__actions">
                 <a className="btn" href="#join">
-                  Email us about Saturday
+                  {ASK_LABEL}
                 </a>
                 <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
                   Cheryl on YouTube
@@ -274,7 +321,7 @@ function App() {
             <ol className="steps">
               <li>
                 <h3>Say who you are</h3>
-                <p>Your name, and whether you’re coming to a Calgary home or joining online.</p>
+                <p>Your name, whether you’re coming to a Calgary home or joining on Zoom, and how many adults and children.</p>
               </li>
               <li>
                 <h3>Get the next gathering</h3>
@@ -434,52 +481,78 @@ function App() {
               </p>
               <SaturdayCard />
             </div>
-            <form className="form" onSubmit={handleContact}>
-              <label>
-                Name
-                <input name="name" type="text" autoComplete="name" required />
-              </label>
-              <label>
-                Email
-                <input name="email" type="email" autoComplete="email" required />
-              </label>
-              <label>
-                Where are you joining from?
-                <select name="place" required defaultValue="">
-                  <option value="" disabled>
-                    Choose one
-                  </option>
-                  <option>Calgary (in person)</option>
-                  <option>Elsewhere in Alberta</option>
-                  <option>North America (online)</option>
-                  <option>Africa (online)</option>
-                  <option>Other</option>
-                </select>
-              </label>
-              <label>
-                City or country (optional)
-                <input name="city" type="text" autoComplete="address-level2" />
-              </label>
-              <label>
-                Message
-                <textarea name="message" rows={4} required placeholder="I’d like to come this Saturday." />
-              </label>
-              <button className="btn btn--block" type="submit">
-                Email us about Saturday
-              </button>
-              {mailOpened ? (
-                <p className="form-note" role="status">
-                  Your mail app should open with the note drafted. Nothing leaves until you send
-                  it. If nothing opened, write to{' '}
-                  <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+            {status === 'sent' ? (
+              <div className="form form--done" ref={sentRef} tabIndex={-1} role="status">
+                <h3>Message sent</h3>
+                <p>
+                  We have it. We reply within a day with Saturday’s address or the Zoom link.
                 </p>
-              ) : (
-                <p className="form-note">
-                  This opens a draft to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-                  Your mail app sends it, not this page.
-                </p>
-              )}
-            </form>
+                <button className="text-link" type="button" onClick={() => setStatus('idle')}>
+                  Send another
+                </button>
+              </div>
+            ) : (
+              <form className="form" onSubmit={handleContact}>
+                <label>
+                  Name
+                  <input name="name" type="text" autoComplete="name" required />
+                </label>
+                <label>
+                  Email
+                  <input name="email" type="email" autoComplete="email" required />
+                </label>
+                <label>
+                  How will you join?
+                  <select name="joining" required defaultValue="">
+                    <option value="" disabled>
+                      Choose one
+                    </option>
+                    <option>In person in Calgary</option>
+                    <option>On Zoom</option>
+                  </select>
+                </label>
+                <label>
+                  Area of Calgary, or city and country on Zoom (optional)
+                  <input name="area" type="text" autoComplete="off" />
+                </label>
+                <div className="form__row">
+                  <label>
+                    Adults
+                    <input name="adults" type="number" inputMode="numeric" min={1} max={20} defaultValue={1} required />
+                  </label>
+                  <label>
+                    Children
+                    <input name="children" type="number" inputMode="numeric" min={0} max={20} defaultValue={0} required />
+                  </label>
+                </div>
+                <label>
+                  Message (optional)
+                  <textarea name="message" rows={4} placeholder="I’d like to come this Saturday." />
+                </label>
+                <button className="btn btn--block" type="submit" disabled={status === 'sending'}>
+                  {status === 'sending' ? 'Sending…' : CONTACT_ENDPOINT ? 'Send my request' : ASK_LABEL}
+                </button>
+                {status === 'drafted' && (
+                  <p className="form-note" role="status">
+                    Your mail app should open with the note drafted. Nothing is sent until you press
+                    send there. If nothing opened, write to{' '}
+                    <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  </p>
+                )}
+                {status === 'failed' && (
+                  <p className="form-note form-note--error" role="alert">
+                    That did not send. <a href={fallbackHref}>Open an email draft instead</a>, or
+                    write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  </p>
+                )}
+                {!CONTACT_ENDPOINT && status !== 'drafted' && (
+                  <p className="form-note">
+                    This opens a draft to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                    Your mail app sends it, not this page.
+                  </p>
+                )}
+              </form>
+            )}
           </div>
         </section>
 
