@@ -75,10 +75,6 @@ const FAQ = [
     a: 'Yes. During the week members agree on what to cook, and each person brings their dish to the hosting home. On your first Saturday, ask us what to bring when you write.',
   },
   {
-    q: 'Are children welcome?',
-    a: 'Yes. Children join. They have their own interactive sessions on the same topic being studied, so everyone is on the same page.',
-  },
-  {
     q: 'What should I expect the first time?',
     a: 'People will say hello. We read the Bible, pray, and talk. There is no stage.',
   },
@@ -335,32 +331,42 @@ function App() {
         </section>
 
         <section id="gather" className="section section--paper gather">
-          <div className="wrap gather__intro">
-            <h2 id="gather-title" tabIndex={-1}>
-              When we are together
-            </h2>
-            <p>
-              Saturday, 7 to 9 pm, in a member’s home in Calgary or on Zoom. There is no stage.
-              Here is what goes into the evening. Write to us and we can tell you how it runs.
-            </p>
-            <dl className="parts">
-              <div>
-                <dt>Hello</dt>
-                <dd>People will say hello.</dd>
-              </div>
-              <div>
-                <dt>The meal</dt>
-                <dd>Members agree on a menu during the week. Each brings a dish to the home.</dd>
-              </div>
-              <div>
-                <dt>Scripture and prayer</dt>
-                <dd>We read the Bible, talk about it, and pray. Pastor Cheryl leads.</dd>
-              </div>
-              <div>
-                <dt>Zoom</dt>
-                <dd>Online is through Zoom. Ask for the link and we send it for the next Saturday.</dd>
-              </div>
-            </dl>
+          <div className="wrap gather__grid">
+            <div className="gather__intro">
+              <h2 id="gather-title" tabIndex={-1}>
+                When we are together
+              </h2>
+              <p>
+                Saturday, 7 to 9 pm, in a member’s home in Calgary or on Zoom. There is no stage.
+                Here is what goes into the evening. Write to us and we can tell you how it runs.
+              </p>
+              <dl className="parts">
+                <div>
+                  <dt>Hello</dt>
+                  <dd>People will say hello.</dd>
+                </div>
+                <div>
+                  <dt>The meal</dt>
+                  <dd>Members agree on a menu during the week. Each brings a dish to the home.</dd>
+                </div>
+                <div>
+                  <dt>Scripture and prayer</dt>
+                  <dd>We read the Bible, talk about it, and pray. Pastor Cheryl leads.</dd>
+                </div>
+                <div>
+                  <dt>Zoom</dt>
+                  <dd>Online is through Zoom. Ask for the link and we send it for the next Saturday.</dd>
+                </div>
+              </dl>
+            </div>
+            <aside className="children" aria-labelledby="children-title">
+              <h3 id="children-title">Children come too</h3>
+              <p>
+                Children have their own interactive sessions on the same topic being studied, so
+                everyone is on the same page.
+              </p>
+              <p>Put the number of children in your note when you write.</p>
+            </aside>
           </div>
           {GATHERING_PHOTO && (
             <figure className="wrap gather__photo">

@@ -404,6 +404,39 @@
   background: var(--paper);
 }
 
+.gather__grid {
+  display: grid;
+  gap: 1.75rem;
+}
+
+.children {
+  background: var(--page);
+  border: 1px solid var(--line);
+  padding: 1.1rem;
+}
+
+.children h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+}
+
+.children p {
+  margin: 0;
+}
+
+.children p + p {
+  margin-top: 0.6rem;
+  color: var(--muted);
+}
+
+@media (min-width: 56rem) {
+  .gather__grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+  }
+}
+
 .gather__intro {
   max-width: 40rem;
 }
