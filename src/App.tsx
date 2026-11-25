@@ -75,6 +75,10 @@ const FAQ = [
     a: 'Yes. During the week members agree on what to cook, and each person brings their dish to the hosting home. On your first Saturday, ask us what to bring when you write.',
   },
   {
+    q: 'What about parking, what to wear, and a Bible?',
+    a: 'We don’t list those here. Ask in your message and we reply within a day.',
+  },
+  {
     q: 'What should I expect the first time?',
     a: 'People will say hello. We read the Bible, pray, and talk. There is no stage.',
   },
@@ -540,7 +544,7 @@ function App() {
                 </div>
                 <label>
                   Message (optional)
-                  <textarea name="message" rows={4} placeholder="I’d like to come this Saturday." />
+                  <textarea name="message" rows={4} placeholder="I’d like to come this Saturday. Questions are welcome." />
                 </label>
                 <button className="btn btn--block" type="submit" disabled={status === 'sending'}>
                   {status === 'sending' ? 'Sending…' : CONTACT_ENDPOINT ? 'Send my request' : ASK_LABEL}
