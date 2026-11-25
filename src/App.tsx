@@ -340,9 +340,27 @@ function App() {
               When we are together
             </h2>
             <p>
-              From 7 to 9 we sit with Scripture open, pray, and talk. There is no stage. Write to
-              us for the next home address or the online link.
+              Saturday, 7 to 9 pm, in a member’s home in Calgary or on Zoom. There is no stage.
+              Here is what goes into the evening. Write to us and we can tell you how it runs.
             </p>
+            <dl className="parts">
+              <div>
+                <dt>Hello</dt>
+                <dd>People will say hello.</dd>
+              </div>
+              <div>
+                <dt>The meal</dt>
+                <dd>Members agree on a menu during the week. Each brings a dish to the home.</dd>
+              </div>
+              <div>
+                <dt>Scripture and prayer</dt>
+                <dd>We read the Bible, talk about it, and pray. Pastor Cheryl leads.</dd>
+              </div>
+              <div>
+                <dt>Zoom</dt>
+                <dd>Online is through Zoom. Ask for the link and we send it for the next Saturday.</dd>
+              </div>
+            </dl>
           </div>
           {GATHERING_PHOTO && (
             <figure className="wrap gather__photo">
