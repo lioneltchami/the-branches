@@ -429,7 +429,7 @@
   padding-left: 1.25rem;
 }
 
-.gather__welcome {
+.gather__intro .gather__welcome {
   margin-top: 1.25rem;
   font-weight: 600;
 }
