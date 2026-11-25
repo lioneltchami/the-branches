@@ -342,7 +342,7 @@ function App() {
               </h2>
               <p>
                 Saturday, 7 to 9 pm, in a member’s home in Calgary or on Zoom. There is no stage.
-                Here is what goes into the evening. Write to us and we can tell you how it runs.
+                Write to us and we can tell you how the evening runs.
               </p>
               <dl className="parts">
                 <div>
@@ -359,7 +359,7 @@ function App() {
                 </div>
                 <div>
                   <dt>Zoom</dt>
-                  <dd>Online is through Zoom. Ask for the link and we send it for the next Saturday.</dd>
+                  <dd>Join from wherever you are. Ask for the link and we send it for the next Saturday.</dd>
                 </div>
               </dl>
             </div>
