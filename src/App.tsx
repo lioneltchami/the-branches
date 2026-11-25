@@ -3,7 +3,7 @@ import './App.css'
 
 const YOUTUBE = 'https://www.youtube.com/@cheryloutten8100'
 const BOOK = 'https://www.cherylbay.com/'
-const CONTACT_EMAIL = 'fellowship@thebranches.ca'
+const CONTACT_EMAIL = 'REPLACE-WITH-REAL-INBOX@example.com'
 const CONTACT_ENDPOINT: string = ''
 const ASK_LABEL = CONTACT_ENDPOINT ? 'Ask about Saturday' : 'Email us about Saturday'
 
@@ -412,8 +412,13 @@ function App() {
             </h2>
             <p>
               Walking into a home you have not been to before can feel like a lot. Cheryl leads
-              The Branches and teaches from Scripture. Her recent messages are below, so you can
-              hear her teach before you come. More are on her YouTube channel.
+              The Branches and teaches from Scripture. She has been in prayer ministry and inner
+              healing for over twenty years. For fifteen of those years she facilitated small
+              groups in Edmonton, Alberta, under the oversight and training of a local ministry.
+            </p>
+            <p>
+              Her recent messages are below, so you can hear her teach before you come. More are
+              on her YouTube channel.
             </p>
             <p>
               <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
@@ -601,11 +606,11 @@ function App() {
             <p className="book__sub">How to Walk With The Wounded</p>
             <p>
               Cheryl wrote this for people in grief, and for the friends walking with them: what
-              to say, and what to leave unsaid.
+              to say, and what to leave unsaid. The book and her own site live at cherylbay.com.
             </p>
             <p>
               <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
-                Read about the book on cherylbay.com
+                Visit cherylbay.com
                 <span className="sr"> (opens in a new tab)</span>
               </a>
             </p>
