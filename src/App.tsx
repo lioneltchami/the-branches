@@ -386,8 +386,9 @@ function App() {
               Pastor Cheryl Outten
             </h2>
             <p>
-              Cheryl leads The Branches and teaches from Scripture. A few recent messages sit
-              below. More are on her YouTube channel.
+              Walking into a home you have not been to before can feel like a lot. Cheryl leads
+              The Branches and teaches from Scripture. Her recent messages are below, so you can
+              hear her teach before you come. More are on her YouTube channel.
             </p>
             <p>
               <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
@@ -580,7 +581,7 @@ function App() {
             </p>
             <p>
               <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
-                Read about the book
+                Read about the book on cherylbay.com
                 <span className="sr"> (opens in a new tab)</span>
               </a>
             </p>
