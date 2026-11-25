@@ -72,7 +72,7 @@ const FAQ = [
   },
   {
     q: 'Is there a meal?',
-    a: 'Yes. During the week members agree on what to cook. Each person brings their dish to the hosting home.',
+    a: 'Yes. During the week members agree on what to cook, and each person brings their dish to the hosting home. On your first Saturday, ask us what to bring when you write.',
   },
   {
     q: 'Are children welcome?',
@@ -325,7 +325,7 @@ function App() {
               </li>
               <li>
                 <h3>Get the next gathering</h3>
-                <p>We reply with the address or the link. Neither one is posted here.</p>
+                <p>We reply with the address or the link. Neither one is posted here. Ask what to bring, if anything.</p>
               </li>
               <li>
                 <h3>Come that Saturday</h3>
@@ -614,7 +614,7 @@ function SaturdayCard() {
       <ul>
         <li>Calgary homes; hosting rotates</li>
         <li>Online on Zoom</li>
-        <li>Shared meal: cook and bring what you agreed</li>
+        <li>Shared meal, planned during the week</li>
         <li>Children join on the same study topic</li>
         <li>Pastor Cheryl Outten</li>
         <li>We reply within a day</li>
