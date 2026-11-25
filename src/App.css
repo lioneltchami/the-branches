@@ -404,57 +404,18 @@
   background: var(--paper);
 }
 
-.gather {
-  padding-bottom: 0;
-}
-
 .gather__intro {
   max-width: 40rem;
-  margin-bottom: 1.75rem;
 }
 
 .gather__photo {
-  margin: 0;
+  margin-top: 1.75rem;
+}
+
+.gather__photo img {
+  display: block;
   width: 100%;
-}
-
-.gather__frame {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: var(--page);
-  border-block: 1px solid var(--line);
-  overflow: hidden;
-}
-
-.gather__frame img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.gather__frame--empty {
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
-}
-
-.gather__slot {
-  margin: 0;
-  max-width: 28rem;
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: 1rem;
-  line-height: 1.45;
-  color: var(--muted);
-}
-
-.gather__photo figcaption {
-  width: min(var(--wrap), calc(100% - 2rem));
-  margin: 0.65rem auto 2.25rem;
-  font-family: var(--font-ui);
-  font-size: 0.82rem;
-  line-height: 1.4;
-  color: var(--muted);
+  height: auto;
 }
 
 .steps {

@@ -88,7 +88,6 @@ const FAQ = [
   },
 ] as const
 
-/** Set to a file under public/media when a real Saturday photo is ready. No stock. */
 const GATHERING_PHOTO: { src: string; width: number; height: number; alt: string } | null = null
 
 function readRequest(form: HTMLFormElement) {
@@ -345,27 +344,16 @@ function App() {
               us for the next home address or the online link.
             </p>
           </div>
-          <figure className="gather__photo">
-            <div className={`gather__frame ${GATHERING_PHOTO ? '' : 'gather__frame--empty'}`}>
-              {GATHERING_PHOTO ? (
-                <img
-                  src={asset(GATHERING_PHOTO.src)}
-                  width={GATHERING_PHOTO.width}
-                  height={GATHERING_PHOTO.height}
-                  alt={GATHERING_PHOTO.alt}
-                />
-              ) : (
-                <p className="gather__slot">
-                  A Saturday gathering photo will sit here when we have one.
-                </p>
-              )}
-            </div>
-            <figcaption className="wrap">
-              {GATHERING_PHOTO
-                ? GATHERING_PHOTO.alt
-                : 'Gathering photo, added when we have one.'}
-            </figcaption>
-          </figure>
+          {GATHERING_PHOTO && (
+            <figure className="wrap gather__photo">
+              <img
+                src={asset(GATHERING_PHOTO.src)}
+                width={GATHERING_PHOTO.width}
+                height={GATHERING_PHOTO.height}
+                alt={GATHERING_PHOTO.alt}
+              />
+            </figure>
+          )}
         </section>
 
         <section id="pastor" className="section">
