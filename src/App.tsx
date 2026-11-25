@@ -412,13 +412,8 @@ function App() {
             </h2>
             <p>
               Walking into a home you have not been to before can feel like a lot. Cheryl leads
-              The Branches and teaches from Scripture. She has been in prayer ministry and inner
-              healing for over twenty years. For fifteen of those years she led small
-              groups in Edmonton, Alberta, under the oversight and training of a local ministry.
-            </p>
-            <p>
-              Her recent messages are below, so you can hear her teach before you come. More are
-              on her YouTube channel.
+              The Branches and teaches from Scripture. Her recent messages are below, so you can
+              hear her teach before you come. More are on her YouTube channel.
             </p>
             <p>
               <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
