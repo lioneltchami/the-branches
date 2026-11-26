@@ -1,9 +1,14 @@
 import { useEffect, useId, useRef, useState, type FormEvent, type MouseEvent } from 'react'
 import './App.css'
+import { READING } from './content/reading'
 
 const YOUTUBE = 'https://www.youtube.com/@cheryloutten8100'
 const BOOK = 'https://www.cherylbay.com/'
-const CONTACT_EMAIL = 'fellowship@thebranches.ca'
+const CONTACT_EMAIL = 'REPLACE-WITH-REAL-INBOX@example.com'
+const CONTACT_ENDPOINT: string = ''
+const ASK_LABEL = CONTACT_ENDPOINT ? 'Ask about Saturday' : 'Email us about Saturday'
+
+type FormStatus = 'idle' | 'sending' | 'sent' | 'drafted' | 'failed'
 
 const NAV = [
   { href: '#new-here', label: 'New here' },
@@ -52,7 +57,7 @@ const VIDEOS = [
 const FAQ = [
   {
     q: 'When do you meet?',
-    a: 'Every Saturday, 7–9 pm Mountain Time. In homes around Calgary, and on Zoom.',
+    a: 'Every Saturday, Mountain Time. Meal 6–7 pm, then the gathering 7–9 pm, then dessert. In homes around Calgary, and on Zoom.',
   },
   {
     q: 'Where do you meet in Calgary?',
@@ -68,11 +73,15 @@ const FAQ = [
   },
   {
     q: 'Is there a meal?',
-    a: 'Yes. During the week members agree on what to cook. Each person brings their dish to the hosting home.',
+    a: 'Yes, from 6 to 7 pm, before we start. Dessert comes after we finish. During the week members agree on what to cook, and each brings a dish to the hosting home. First-time guests do not bring a dish. Just come and join.',
   },
   {
-    q: 'Are children welcome?',
-    a: 'Yes. Children join. They have their own interactive sessions on the same topic being studied, so everyone is on the same page.',
+    q: 'What about parking, what to wear, and a Bible?',
+    a: 'We don’t list those here. Ask in your message and we reply within a day.',
+  },
+  {
+    q: 'Can I just listen?',
+    a: 'Yes. In person you can just listen. On Zoom your video can be on or off.',
   },
   {
     q: 'What should I expect the first time?',
@@ -84,8 +93,74 @@ const FAQ = [
   },
 ] as const
 
-/** Set to a file under public/media when a real Saturday photo is ready. No stock. */
-const GATHERING_PHOTO: { src: string; width: number; height: number; alt: string } | null = null
+type Photo = { src: string; width: number; height: number; alt: string; caption: string }
+
+const PHOTOS = {
+  meal: {
+    src: 'media/gathering/meal-slow-cookers-1200.webp',
+    width: 1200,
+    height: 708,
+    alt: 'A slow cooker of soup with a ladle on a crowded table. Behind it, a person in red holds a plate.',
+    caption: 'Slow cookers on the meal table, and plates being filled.',
+  },
+  study: {
+    src: 'media/gathering/study-handout-1200.webp',
+    width: 1200,
+    height: 725,
+    alt: 'A person in a denim shirt holds a printed page of small text in a dim room with a coffee table.',
+    caption: 'A printed study sheet in someone’s hands.',
+  },
+  together: {
+    src: 'media/gathering/living-room-guitar-400.webp',
+    width: 400,
+    height: 300,
+    alt: 'Black and white photo of adults and children in a living room. One person plays a guitar, food is on a coffee table, and a screen with text is on the wall.',
+    caption: 'Adults and children together in a living room.',
+  },
+} satisfies Record<string, Photo>
+
+function PhotoFigure({ photo }: { photo: Photo }) {
+  return (
+    <figure className="photo">
+      <img
+        src={asset(photo.src)}
+        width={photo.width}
+        height={photo.height}
+        alt={photo.alt}
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>{photo.caption}</figcaption>
+    </figure>
+  )
+}
+
+function readRequest(form: HTMLFormElement) {
+  const data = new FormData(form)
+  const get = (key: string) => String(data.get(key) || '').trim()
+  return {
+    name: get('name'),
+    email: get('email'),
+    joining: get('joining'),
+    area: get('area'),
+    adults: get('adults'),
+    children: get('children'),
+    message: get('message'),
+  }
+}
+
+function draftHref(request: ReturnType<typeof readRequest>) {
+  const lines = [
+    `Name: ${request.name}`,
+    `Email: ${request.email}`,
+    `Joining: ${request.joining}`,
+  ]
+  if (request.area) lines.push(`Area or city: ${request.area}`)
+  lines.push(`Adults: ${request.adults}`, `Children: ${request.children}`)
+  if (request.message) lines.push('', request.message)
+  const subject = encodeURIComponent(`The Branches: Saturday visit from ${request.name || 'a friend'}`)
+  return `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${encodeURIComponent(lines.join('\n'))}`
+}
 
 function asset(path: string) {
   return `${import.meta.env.BASE_URL}${path}`
@@ -93,7 +168,9 @@ function asset(path: string) {
 
 function App() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [mailOpened, setMailOpened] = useState(false)
+  const [status, setStatus] = useState<FormStatus>('idle')
+  const [fallbackHref, setFallbackHref] = useState('')
+  const sentRef = useRef<HTMLDivElement>(null)
   const [openFaq, setOpenFaq] = useState(0)
   const faqId = useId()
   const toggleRef = useRef<HTMLButtonElement>(null)
@@ -159,24 +236,38 @@ function App() {
     })
   }
 
-  function handleContact(event: FormEvent<HTMLFormElement>) {
+  async function handleContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const name = String(data.get('name') || '').trim()
-    const email = String(data.get('email') || '').trim()
-    const place = String(data.get('place') || '').trim()
-    const city = String(data.get('city') || '').trim()
-    const message = String(data.get('message') || '').trim()
-    const lines = [`Name: ${name}`, `Email: ${email}`, `Joining from: ${place}`]
-    if (city) lines.push(`City or country: ${city}`)
-    lines.push('', message)
-    const subject = encodeURIComponent(
-      `The Branches: Saturday visit from ${name || 'a friend'}`,
-    )
-    const body = encodeURIComponent(lines.join('\n'))
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`
-    setMailOpened(true)
+    const form = event.currentTarget
+    const request = readRequest(form)
+    const href = draftHref(request)
+    if (!CONTACT_ENDPOINT) {
+      window.location.href = href
+      setStatus('drafted')
+      return
+    }
+    setStatus('sending')
+    try {
+      const response = await fetch(CONTACT_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...request,
+          _subject: `The Branches: Saturday visit from ${request.name}`,
+        }),
+      })
+      if (!response.ok) throw new Error(String(response.status))
+      form.reset()
+      setStatus('sent')
+    } catch {
+      setFallbackHref(href)
+      setStatus('failed')
+    }
   }
+
+  useEffect(() => {
+    if (status === 'sent') sentRef.current?.focus()
+  }, [status])
 
   return (
     <div className="site">
@@ -245,7 +336,7 @@ function App() {
               <SaturdayCard />
               <div className="hero__actions">
                 <a className="btn" href="#join">
-                  Email us about Saturday
+                  {ASK_LABEL}
                 </a>
                 <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
                   Cheryl on YouTube
@@ -274,11 +365,11 @@ function App() {
             <ol className="steps">
               <li>
                 <h3>Say who you are</h3>
-                <p>Your name, and whether you’re coming to a Calgary home or joining online.</p>
+                <p>Your name, whether you’re coming to a Calgary home or joining on Zoom, and how many adults and children.</p>
               </li>
               <li>
                 <h3>Get the next gathering</h3>
-                <p>We reply with the address or the link. Neither one is posted here.</p>
+                <p>We reply with the address or the link. Neither one is posted here. You do not need to bring a dish.</p>
               </li>
               <li>
                 <h3>Come that Saturday</h3>
@@ -289,36 +380,65 @@ function App() {
         </section>
 
         <section id="gather" className="section section--paper gather">
-          <div className="wrap gather__intro">
-            <h2 id="gather-title" tabIndex={-1}>
-              When we are together
-            </h2>
-            <p>
-              From 7 to 9 we sit with Scripture open, pray, and talk. There is no stage. Write to
-              us for the next home address or the online link.
-            </p>
-          </div>
-          <figure className="gather__photo">
-            <div className={`gather__frame ${GATHERING_PHOTO ? '' : 'gather__frame--empty'}`}>
-              {GATHERING_PHOTO ? (
-                <img
-                  src={asset(GATHERING_PHOTO.src)}
-                  width={GATHERING_PHOTO.width}
-                  height={GATHERING_PHOTO.height}
-                  alt={GATHERING_PHOTO.alt}
-                />
-              ) : (
-                <p className="gather__slot">
-                  A Saturday gathering photo will sit here when we have one.
-                </p>
-              )}
+          <div className="wrap gather__grid">
+            <div className="gather__intro">
+              <h2 id="gather-title" tabIndex={-1}>
+                When we are together
+              </h2>
+              <p>
+                Saturdays, in a member’s home in Calgary or on Zoom. People will say hello. There
+                is no stage.
+              </p>
+              <dl className="parts">
+                <div>
+                  <dt>6–7 pm</dt>
+                  <dd>
+                    The meal, before we start. Members agree on a menu during the week and each
+                    brings a dish to the home. First-time guests do not bring one. Just come and
+                    join.
+                    <PhotoFigure photo={PHOTOS.meal} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>7–9 pm</dt>
+                  <dd>
+                    We read the Bible, talk about it, and pray. Pastor Cheryl leads.
+                    <PhotoFigure photo={PHOTOS.study} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>After we finish</dt>
+                  <dd>Dessert.</dd>
+                </div>
+                <div>
+                  <dt>On Zoom</dt>
+                  <dd>
+                    Join from wherever you are. Ask for the link and we send it for the next
+                    Saturday. Your video can be on or off.
+                  </dd>
+                </div>
+              </dl>
+              <p className="gather__welcome">
+                You can just listen. No question is stupid. Come willing to be there, whatever you
+                think you know or don’t know.
+              </p>
             </div>
-            <figcaption className="wrap">
-              {GATHERING_PHOTO
-                ? GATHERING_PHOTO.alt
-                : 'Gathering photo, added when we have one.'}
-            </figcaption>
-          </figure>
+            <aside className="children" aria-labelledby="children-title">
+              <PhotoFigure photo={PHOTOS.together} />
+              <h3 id="children-title">Children come too</h3>
+              <p>All ages are welcome. For children, the evening goes in this order.</p>
+              <ol className="kids-flow">
+                <li>We start together.</li>
+                <li>The children eat.</li>
+                <li>Then they join us.</li>
+              </ol>
+              <p>
+                Children have their own interactive sessions on the same topic being studied, so
+                everyone is on the same page. Right now that is {READING.title}.
+              </p>
+              <p>Put the number of children in your note when you write.</p>
+            </aside>
+          </div>
         </section>
 
         <section id="pastor" className="section">
@@ -327,8 +447,9 @@ function App() {
               Pastor Cheryl Outten
             </h2>
             <p>
-              Cheryl leads The Branches and teaches from Scripture. A few recent messages sit
-              below. More are on her YouTube channel.
+              Walking into a home you have not been to before can feel like a lot. Cheryl leads
+              The Branches and teaches from Scripture. Her recent messages are below, so you can
+              hear her teach before you come. More are on her YouTube channel.
             </p>
             <p>
               <a className="text-link" href={YOUTUBE} target="_blank" rel="noreferrer">
@@ -428,58 +549,118 @@ function App() {
               <h2 id="join-title" tabIndex={-1}>
                 Write to us
               </h2>
-              <p>
-                Ask for the next Saturday. Say whether you’re coming in Calgary or joining
-                online.
+              <p className="join__note">
+                Tell us whether you are coming to a Calgary home or joining on Zoom, and how many
+                adults and children. We reply within a day with the address or the Zoom link.
               </p>
-              <SaturdayCard />
             </div>
-            <form className="form" onSubmit={handleContact}>
-              <label>
-                Name
-                <input name="name" type="text" autoComplete="name" required />
-              </label>
-              <label>
-                Email
-                <input name="email" type="email" autoComplete="email" required />
-              </label>
-              <label>
-                Where are you joining from?
-                <select name="place" required defaultValue="">
-                  <option value="" disabled>
-                    Choose one
-                  </option>
-                  <option>Calgary (in person)</option>
-                  <option>Elsewhere in Alberta</option>
-                  <option>North America (online)</option>
-                  <option>Africa (online)</option>
-                  <option>Other</option>
-                </select>
-              </label>
-              <label>
-                City or country (optional)
-                <input name="city" type="text" autoComplete="address-level2" />
-              </label>
-              <label>
-                Message
-                <textarea name="message" rows={4} required placeholder="I’d like to come this Saturday." />
-              </label>
-              <button className="btn btn--block" type="submit">
-                Email us about Saturday
-              </button>
-              {mailOpened ? (
-                <p className="form-note" role="status">
-                  Your mail app should open with the note drafted. Nothing leaves until you send
-                  it. If nothing opened, write to{' '}
-                  <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+            {status === 'sent' ? (
+              <div className="form form--done" ref={sentRef} tabIndex={-1} role="status">
+                <h3>Message sent</h3>
+                <p>
+                  We have it. We reply within a day with Saturday’s address or the Zoom link.
                 </p>
-              ) : (
-                <p className="form-note">
-                  This opens a draft to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
-                  Your mail app sends it, not this page.
-                </p>
-              )}
-            </form>
+                <button className="text-link" type="button" onClick={() => setStatus('idle')}>
+                  Send another
+                </button>
+              </div>
+            ) : (
+              <form className="form" onSubmit={handleContact}>
+                <label>
+                  Name
+                  <input name="name" type="text" autoComplete="name" required />
+                </label>
+                <label>
+                  Email
+                  <input name="email" type="email" autoComplete="email" required />
+                </label>
+                <label>
+                  How will you join?
+                  <select name="joining" required defaultValue="">
+                    <option value="" disabled>
+                      Choose one
+                    </option>
+                    <option>In person in Calgary</option>
+                    <option>On Zoom</option>
+                  </select>
+                </label>
+                <label>
+                  Area of Calgary, or city and country on Zoom (optional)
+                  <input name="area" type="text" autoComplete="off" />
+                </label>
+                <div className="form__row">
+                  <label>
+                    Adults
+                    <input name="adults" type="number" inputMode="numeric" min={1} max={20} defaultValue={1} required />
+                  </label>
+                  <label>
+                    Children
+                    <input name="children" type="number" inputMode="numeric" min={0} max={20} defaultValue={0} required />
+                  </label>
+                </div>
+                <label>
+                  Message (optional)
+                  <textarea name="message" rows={4} placeholder="I’d like to come this Saturday. Questions are welcome." />
+                </label>
+                <button className="btn btn--block" type="submit" disabled={status === 'sending'}>
+                  {status === 'sending' ? 'Sending…' : CONTACT_ENDPOINT ? 'Send my request' : ASK_LABEL}
+                </button>
+                {status === 'drafted' && (
+                  <p className="form-note" role="status">
+                    Your mail app should open with the note drafted. Nothing is sent until you press
+                    send there. If nothing opened, write to{' '}
+                    <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  </p>
+                )}
+                {status === 'failed' && (
+                  <p className="form-note form-note--error" role="alert">
+                    That did not send. <a href={fallbackHref}>Open an email draft instead</a>, or
+                    write to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                  </p>
+                )}
+                {!CONTACT_ENDPOINT && status !== 'drafted' && (
+                  <p className="form-note">
+                    This opens a draft to <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
+                    Your mail app sends it, not this page.
+                  </p>
+                )}
+              </form>
+            )}
+          </div>
+        </section>
+
+        <section id="share" className="section share">
+          <div className="wrap share__inner">
+            <img
+              className="share__preview"
+              src={asset('media/the-branches-flyer-preview-448.webp')}
+              alt="The Branches flyer: Saturdays Around the Table. Meal at 6 pm, then gathering 7 to 9 pm Mountain Time, every Saturday, over a photo of a pot of food."
+              width={448}
+              height={560}
+              loading="lazy"
+              decoding="async"
+            />
+            <div>
+              <h2 id="share-title" tabIndex={-1}>
+                Share this flyer
+              </h2>
+              <p>
+                Know someone who might like to come? Post it or print it. Send them to this page
+                to ask about Saturday.
+              </p>
+              <ul className="share__links">
+                <li>
+                  <a className="btn" href={asset('media/the-branches-flyer-1080x1350.png')} download>
+                    Download for social (PNG)
+                  </a>
+                </li>
+                <li>
+                  <a className="text-link" href={asset('media/the-branches-flyer-8.5x11.pdf')} download>
+                    Download to print (PDF, letter size)
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
@@ -491,11 +672,11 @@ function App() {
             <p className="book__sub">How to Walk With The Wounded</p>
             <p>
               Cheryl wrote this for people in grief, and for the friends walking with them: what
-              to say, and what to leave unsaid.
+              to say, and what to leave unsaid. The book and her own site live at cherylbay.com.
             </p>
             <p>
               <a className="text-link" href={BOOK} target="_blank" rel="noreferrer">
-                Read about the book
+                Visit cherylbay.com
                 <span className="sr"> (opens in a new tab)</span>
               </a>
             </p>
@@ -541,11 +722,16 @@ function SaturdayCard() {
       <ul>
         <li>Calgary homes; hosting rotates</li>
         <li>Online on Zoom</li>
-        <li>Shared meal: cook and bring what you agreed</li>
-        <li>Children join on the same study topic</li>
+        <li>Meal 6–7 pm before we start; dessert after</li>
+        <li>All ages welcome, with children’s sessions on the same topic</li>
         <li>Pastor Cheryl Outten</li>
-        <li>We reply within a day</li>
       </ul>
+      <p className="saturday__reading">
+        <span>Now reading</span>
+        {READING.title}
+        {READING.passage ? `, ${READING.passage}` : ''}
+        {READING.note && <small>{READING.note}</small>}
+      </p>
     </div>
   )
 }
