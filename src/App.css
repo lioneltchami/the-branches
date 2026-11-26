@@ -810,6 +810,36 @@
   }
 }
 
+.share__inner {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.share__preview {
+  display: block;
+  width: 100%;
+  max-width: 14rem;
+  height: auto;
+  border: 1px solid var(--line);
+}
+
+.share__links {
+  display: grid;
+  justify-items: start;
+  gap: 0.85rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40rem) {
+  .share__inner {
+    grid-template-columns: 14rem 1fr;
+    gap: 2rem;
+  }
+}
+
 .book__sub {
   margin-top: -0.35rem;
   font-style: italic;

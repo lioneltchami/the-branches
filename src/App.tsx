@@ -629,6 +629,41 @@ function App() {
           </div>
         </section>
 
+        <section id="share" className="section share">
+          <div className="wrap share__inner">
+            <img
+              className="share__preview"
+              src={asset('media/the-branches-flyer-preview-448.webp')}
+              alt="The Branches flyer: Saturdays Around the Table. Meal at 6 pm, then gathering 7 to 9 pm Mountain Time, every Saturday, over a photo of a pot of food."
+              width={448}
+              height={560}
+              loading="lazy"
+              decoding="async"
+            />
+            <div>
+              <h2 id="share-title" tabIndex={-1}>
+                Share this flyer
+              </h2>
+              <p>
+                Know someone who might like to come? Post it or print it. Send them to this page
+                to ask about Saturday.
+              </p>
+              <ul className="share__links">
+                <li>
+                  <a className="btn" href={asset('media/the-branches-flyer-1080x1350.png')} download>
+                    Download for social (PNG)
+                  </a>
+                </li>
+                <li>
+                  <a className="text-link" href={asset('media/the-branches-flyer-8.5x11.pdf')} download>
+                    Download to print (PDF, letter size)
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
         <section id="book" className="section book">
           <div className="wrap narrow">
             <h2 id="book-title" tabIndex={-1}>
