@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, useState, type FormEvent, type MouseEvent } from 'react'
 import './App.css'
+import { READING } from './content/reading'
 
 const YOUTUBE = 'https://www.youtube.com/@cheryloutten8100'
 const BOOK = 'https://www.cherylbay.com/'
@@ -433,7 +434,7 @@ function App() {
               </ol>
               <p>
                 Children have their own interactive sessions on the same topic being studied, so
-                everyone is on the same page.
+                everyone is on the same page. Right now that is {READING.title}.
               </p>
               <p>Put the number of children in your note when you write.</p>
             </aside>
@@ -690,6 +691,12 @@ function SaturdayCard() {
         <li>All ages welcome, with children’s sessions on the same topic</li>
         <li>Pastor Cheryl Outten</li>
       </ul>
+      <p className="saturday__reading">
+        <span>Now reading</span>
+        {READING.title}
+        {READING.passage ? `, ${READING.passage}` : ''}
+        {READING.note && <small>{READING.note}</small>}
+      </p>
     </div>
   )
 }
