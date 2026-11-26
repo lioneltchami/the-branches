@@ -92,7 +92,47 @@ const FAQ = [
   },
 ] as const
 
-const GATHERING_PHOTO: { src: string; width: number; height: number; alt: string } | null = null
+type Photo = { src: string; width: number; height: number; alt: string; caption: string }
+
+const PHOTOS = {
+  meal: {
+    src: 'media/gathering/meal-slow-cookers-1200.webp',
+    width: 1200,
+    height: 708,
+    alt: 'A slow cooker of soup with a ladle on a crowded table. Behind it, a person in red holds a plate.',
+    caption: 'Slow cookers on the meal table, and plates being filled.',
+  },
+  study: {
+    src: 'media/gathering/study-handout-1200.webp',
+    width: 1200,
+    height: 725,
+    alt: 'A person in a denim shirt holds a printed page of small text in a dim room with a coffee table.',
+    caption: 'A printed study sheet in someone’s hands.',
+  },
+  together: {
+    src: 'media/gathering/living-room-guitar-400.webp',
+    width: 400,
+    height: 300,
+    alt: 'Black and white photo of adults and children in a living room. One person plays a guitar, food is on a coffee table, and a screen with text is on the wall.',
+    caption: 'Adults and children together in a living room.',
+  },
+} satisfies Record<string, Photo>
+
+function PhotoFigure({ photo }: { photo: Photo }) {
+  return (
+    <figure className="photo">
+      <img
+        src={asset(photo.src)}
+        width={photo.width}
+        height={photo.height}
+        alt={photo.alt}
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption>{photo.caption}</figcaption>
+    </figure>
+  )
+}
 
 function readRequest(form: HTMLFormElement) {
   const data = new FormData(form)
@@ -355,11 +395,15 @@ function App() {
                     The meal, before we start. Members agree on a menu during the week and each
                     brings a dish to the home. First-time guests do not bring one. Just come and
                     join.
+                    <PhotoFigure photo={PHOTOS.meal} />
                   </dd>
                 </div>
                 <div>
                   <dt>7–9 pm</dt>
-                  <dd>We read the Bible, talk about it, and pray. Pastor Cheryl leads.</dd>
+                  <dd>
+                    We read the Bible, talk about it, and pray. Pastor Cheryl leads.
+                    <PhotoFigure photo={PHOTOS.study} />
+                  </dd>
                 </div>
                 <div>
                   <dt>After we finish</dt>
@@ -379,6 +423,7 @@ function App() {
               </p>
             </div>
             <aside className="children" aria-labelledby="children-title">
+              <PhotoFigure photo={PHOTOS.together} />
               <h3 id="children-title">Children come too</h3>
               <p>All ages are welcome. For children, the evening goes in this order.</p>
               <ol className="kids-flow">
@@ -393,16 +438,6 @@ function App() {
               <p>Put the number of children in your note when you write.</p>
             </aside>
           </div>
-          {GATHERING_PHOTO && (
-            <figure className="wrap gather__photo">
-              <img
-                src={asset(GATHERING_PHOTO.src)}
-                width={GATHERING_PHOTO.width}
-                height={GATHERING_PHOTO.height}
-                alt={GATHERING_PHOTO.alt}
-              />
-            </figure>
-          )}
         </section>
 
         <section id="pastor" className="section">

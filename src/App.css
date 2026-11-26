@@ -486,14 +486,29 @@
   }
 }
 
-.gather__photo {
-  margin-top: 1.75rem;
+.photo {
+  margin: 0.85rem 0 0;
+  max-width: 32rem;
 }
 
-.gather__photo img {
+.photo img {
   display: block;
   width: 100%;
   height: auto;
+  background: var(--page);
+}
+
+.photo figcaption {
+  margin-top: 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.children .photo {
+  margin: 0 0 1rem;
+  max-width: 400px;
 }
 
 .steps {
